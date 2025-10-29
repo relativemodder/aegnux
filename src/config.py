@@ -8,7 +8,7 @@ BASE_DIR = os.getcwd()
 AE_ICON_PATH = BASE_DIR + '/icons/afterfx.png'
 STYLES_PATH = BASE_DIR + '/styles'
 
-WINE_RUNNER_TAR = BASE_DIR + '/assets/wine-10.17-amd64-wow64.tar.gz'
+WINE_RUNNER_DIR = BASE_DIR + '/assets/wine-10.17-amd64-wow64'
 WINETRICKS_BIN = BASE_DIR + '/bin/winetricks'
 CABEXTRACT_BIN = BASE_DIR + '/bin/cabextract'
 

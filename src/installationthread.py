@@ -2,7 +2,7 @@ import os
 import shutil
 from src.config import (
     AE_DOWNLOAD_URL, AE_FILENAME, 
-    WINE_RUNNER_TAR, WINETRICKS_BIN, 
+    WINE_RUNNER_DIR, WINETRICKS_BIN, 
     CABEXTRACT_BIN, WINE_STYLE_REG,
     VCR_ZIP, MSXML_ZIP
 )
@@ -45,8 +45,8 @@ class InstallationThread(ProcessThread):
             
             self.progress_signal.emit(20)
 
-            self.log_signal.emit(f'[DEBUG] Unpacking Wine Runner from {WINE_RUNNER_TAR}...')
-            self.unpack_tar(WINE_RUNNER_TAR, get_wine_runner_dir().as_posix())
+            self.log_signal.emit(f'[DEBUG] Copying Wine Runner from {WINE_RUNNER_DIR}...')
+            shutil.copytree(WINE_RUNNER_DIR, get_wine_runner_dir(), dirs_exist_ok=True)
             
             self.progress_signal.emit(30)
 
