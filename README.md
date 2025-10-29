@@ -18,7 +18,10 @@ This project is intended for educational and experimental use only. Please respe
 
 ## How to install
 
-The only tested environment is Arch Linux on KDE Plasma Wayland.
+[Download Flatpak](https://github.com/relativemodder/com.relative.Aegnux/releases) if you want to install it on any distro.
+
+
+Native installation: the only tested environment is Arch Linux on KDE Plasma Wayland.
 
 ### Install dependencies
 ```bash
