@@ -138,3 +138,16 @@ def mark_aegnux_as_installed():
 def get_wine_bin_path_env(old_path: str | None):
     old_path = old_path if old_path is not None else os.getenv('PATH')
     return f'{get_wine_runner_dir().as_posix()}/bin:{old_path}'
+
+
+
+def get_aegnux_tip_marked_flag_path():
+    hades = get_aegnux_installation_dir()
+    return hades.joinpath('terminal_tip')
+
+def check_aegnux_tip_marked():
+    return os.path.exists(get_aegnux_tip_marked_flag_path())
+
+def mark_aegnux_tip_as_shown():
+    with open(get_aegnux_tip_marked_flag_path(), 'w') as f:
+        f.write('Press ALT+T to open up a terminal')

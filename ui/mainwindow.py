@@ -119,6 +119,7 @@ class MainWindowUI(QMainWindow):
         self.toggle_logs_button.setIcon(QIcon.fromTheme('view-list-text'))
         self.toggle_logs_button.setIconSize(QSize(25, 15))
         self.toggle_logs_button.setObjectName('toggle_logs_button')
+        self.toggle_logs_button.setVisible(False)
         action_col.addWidget(self.toggle_logs_button)
 
         folders_row.addWidget(self.plugins_button)

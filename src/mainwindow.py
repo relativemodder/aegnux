@@ -1,13 +1,19 @@
 import os
+import subprocess
 from ui.mainwindow import MainWindowUI
 from translations import gls
 from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QFileDialog
+from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtWidgets import QFileDialog, QMessageBox
 from src.installationthread import InstallationThread
 from src.runaethread import RunAEThread
 from src.killaethread import KillAEThread
 from src.removeaethread import RemoveAEThread
-from src.utils import show_download_method_dialog, get_ae_plugins_dir, get_wineprefix_dir
+from src.utils import (
+    check_aegnux_tip_marked, get_wine_bin_path_env, 
+    show_download_method_dialog, get_ae_plugins_dir, get_wineprefix_dir, 
+    check_aegnux_installed, mark_aegnux_tip_as_shown
+)
 from src.types import DownloadMethod
 
 
@@ -37,12 +43,20 @@ class MainWindow(MainWindowUI):
         self.remove_ae_thread = RemoveAEThread()
         self.remove_ae_thread.finished_signal.connect(self._finished)
 
+        self.alt_t_action = QAction(self)
+        self.alt_t_action.setShortcut(QKeySequence("Alt+T"))
+        self.alt_t_action.triggered.connect(self.run_command_alt_t)
+        self.addAction(self.alt_t_action)
+
         self.init_installation()
 
     def lock_ui(self, lock: bool = True):
         self.install_button.setEnabled(not lock)
         self.run_button.setEnabled(not lock)
         self.remove_aegnux_button.setEnabled(not lock)
+
+        if not self.logs_edit.isVisible():
+            self.toggle_logs_button.setVisible(lock)
     
     @Slot()
     def toggle_logs(self):
@@ -56,6 +70,11 @@ class MainWindow(MainWindowUI):
         self.lock_ui(False)
         self.progress_bar.hide()
         self.init_installation()
+
+        if check_aegnux_installed() and not check_aegnux_tip_marked():
+            QMessageBox.information(self, '', gls('tip_alt_t'))
+            mark_aegnux_tip_as_shown()
+
 
     @Slot(str)
     def _log(self, message: str):
@@ -107,3 +126,14 @@ class MainWindow(MainWindowUI):
     @Slot()
     def wineprefix_folder_clicked(self):
         os.system(f'xdg-open "{get_wineprefix_dir()}"')
+    
+    @Slot()
+    def run_command_alt_t(self):
+        env = os.environ.copy()
+        env['WINEPREFIX'] = get_wineprefix_dir()
+        env['PATH'] = get_wine_bin_path_env('/usr/bin')
+
+        process = subprocess.Popen(
+            ['./bin/kitty/bin/kitty', 'bash'],
+            env=env
+        )
