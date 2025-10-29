@@ -9,13 +9,16 @@
     margin-right: 3em;
 }
                
-#install_button {
-    margin-top: 30px;
-    margin-bottom: 30px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    margin-left: 3em;
-    margin-right: 3em;
+#install_button,
+#run_ae,
+#toggle_logs_button,
+#remove_aegnux_button,
+#kill_ae,
+#plugins_button,
+#wineprefix_button {
+    width: 100%;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
 #footer_label {

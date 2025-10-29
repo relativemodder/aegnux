@@ -3,5 +3,14 @@ STRINGS = {
     'welcome_to_aegnux': 'Welcome to Aegnux!',
     'subtitle_text': 'A simpler way to get After Effects running on GNU/Linux',
     'install': 'Install',
-    'footer_text': 'Made with 💙 by Relative'
+    'footer_text': 'Made with 💙 by Relative',
+    'installation_method_title': 'Installation Method',
+    'installation_method_text': 'How would you like to install Aegnux?',
+    'offline_ae_zip_title': 'Select AE Zip File',
+    'run_ae': 'Run AE',
+    'kill_ae': 'Kill AE',
+    'toggle_logs': 'Toggle logs',
+    'remove_aegnux': 'Remove Aegnux',
+    'plugins': 'Plugins',
+    'wineprefix': 'Wine prefix'
 }
