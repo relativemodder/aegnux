@@ -59,7 +59,14 @@ class MainWindowUI(QMainWindow):
         logo_label = QLabel()
         logo_pixmap = QPixmap(AE_ICON_PATH)
 
-        logo_label.setPixmap(logo_pixmap)
+        scaled_pixmap = logo_pixmap.scaled(
+            64,                                     # Ширина
+            64,                                     # Высота
+            Qt.AspectRatioMode.KeepAspectRatio,     # Сохранять соотношение сторон
+            Qt.TransformationMode.SmoothTransformation
+        )
+
+        logo_label.setPixmap(scaled_pixmap)
         logo_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         self.root_layout.addWidget(logo_label)
 

@@ -5,7 +5,7 @@ DESKTOP_FILE_NAME='com.relative.Aegnux'
 
 BASE_DIR = os.getcwd()
 
-AE_ICON_PATH = BASE_DIR + '/icons/afterfx.png'
+AE_ICON_PATH = BASE_DIR + '/icons/aegnux.png'
 STYLES_PATH = BASE_DIR + '/styles'
 
 WINE_RUNNER_DIR = BASE_DIR + '/assets/wine-10.17-amd64-wow64'
