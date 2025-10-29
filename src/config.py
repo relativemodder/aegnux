@@ -8,7 +8,7 @@ BASE_DIR = os.getcwd()
 AE_ICON_PATH = BASE_DIR + '/icons/aegnux.png'
 STYLES_PATH = BASE_DIR + '/styles'
 
-WINE_RUNNER_DIR = BASE_DIR + '/assets/wine-10.17-amd64-wow64'
+WINE_RUNNER_DIR = BASE_DIR + '/assets/wine'
 WINETRICKS_BIN = BASE_DIR + '/bin/winetricks'
 CABEXTRACT_BIN = BASE_DIR + '/bin/cabextract'
 
