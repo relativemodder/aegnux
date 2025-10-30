@@ -48,6 +48,11 @@ class MainWindow(MainWindowUI):
         self.alt_t_action.triggered.connect(self.run_command_alt_t)
         self.addAction(self.alt_t_action)
 
+        self.ctrl_q_action = QAction(self)
+        self.ctrl_q_action.setShortcut(QKeySequence("Ctrl+Q"))
+        self.ctrl_q_action.triggered.connect(self.run_command_ctrl_q)
+        self.addAction(self.ctrl_q_action)
+
         self.init_installation()
 
     def lock_ui(self, lock: bool = True):
@@ -137,3 +142,7 @@ class MainWindow(MainWindowUI):
             ['./bin/kitty/bin/kitty', 'bash'],
             env=env
         )
+    
+    @Slot()
+    def run_command_ctrl_q(self):
+        exit()

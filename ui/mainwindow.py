@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QVBoxLayout, QWidget, QHBoxLayout,
-    QLabel, QMainWindow, QPushButton,
+    QLabel, QMainWindow, QPushButton, QMessageBox,
     QSpacerItem, QSizePolicy, QTextEdit, QProgressBar
 )
 from PySide6.QtCore import Qt, QSize
@@ -169,3 +169,16 @@ class MainWindowUI(QMainWindow):
         footer_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         self.root_layout.addWidget(footer_label)
+    
+    def closeEvent(self, event):
+        reply = QMessageBox.question(
+            self, gls('confirm_exit'),
+            gls('confirm_exit_text'),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            event.accept()
+        else:
+            event.ignore()

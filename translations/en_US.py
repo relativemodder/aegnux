@@ -13,5 +13,7 @@ STRINGS = {
     'remove_aegnux': 'Remove Aegnux',
     'plugins': 'Plugins',
     'wineprefix': 'Wine prefix',
-    'tip_alt_t': 'Tip: press ALT+T to open up a terminal with Wine environment and prefix set.'
+    'tip_alt_t': 'Tip: press ALT+T to open up a terminal with Wine environment and prefix set.',
+    'confirm_exit': 'Confirm exit',
+    'confirm_exit_text': 'Are you sure you want to quit Aegnux?'
 }
