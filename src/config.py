@@ -1,7 +1,7 @@
 import os
 
-LOG_THROTTLE_SECONDS=0.1
-DESKTOP_FILE_NAME='com.relative.Aegnux'
+LOG_THROTTLE_SECONDS = 0.1
+DESKTOP_FILE_NAME = 'com.relative.Aegnux'
 
 BASE_DIR = os.getcwd()
 
@@ -22,4 +22,16 @@ AE_PLUGINS_URL = 'https://huggingface.co/cutefishae/AeNux-model/resolve/main/aen
 
 AE_FILENAME = '/tmp/ae2024.zip'
 
-DOWNLOAD_CHUNK_SIZE=1024
+DOWNLOAD_CHUNK_SIZE = 1024
+
+# Directory where imported Windows codecs will be copied
+CODECS_DIR = BASE_DIR + '/assets/wine/win_codecs'
+
+# Каталог для хранения пользовательских плагинов
+PLUGINS_DIR = BASE_DIR + '/plugins'
+
+# Расширения файлов, считающиеся кодеками при импорте из установки Windows
+CODECS_EXTENSIONS = ['.dll', '.ax', '.acm', '.axf', '.axv']
+
+# По умолчанию не перезаписывать существующие файлы при импорте
+CODECS_OVERWRITE_BY_DEFAULT = False
