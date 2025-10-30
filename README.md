@@ -24,7 +24,7 @@ Native installation: the only tested environment is Arch Linux on KDE Plasma Way
 
 ### Install dependencies
 ```bash
-sudo pacman -Syu python-pyside6 python-requests # Arch Linux
+sudo pacman -Syu pyside6 python-requests # Arch Linux
 ```
 
 ### Clone the repository
