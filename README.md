@@ -4,6 +4,10 @@
 
 A convenient way to install Adobe After Effects on Linux using Wine. Heavily inspired by [AeNux](https://github.com/cutefishaep/AeNux) by cutefish.
 
+⚠️ SOFTWARE IS NOT IN THE RELEASE STATE
+
+⚠️ SOFTWARE CONTAINS BINARY BLOBS (explaination is in the bottom of this README)
+
 [Download Flatpak](https://github.com/relativemodder/com.relative.Aegnux/releases/latest) if you want to install it on any distro.
 
 
