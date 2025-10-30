@@ -51,6 +51,13 @@ cd aegnux
 You're welcome to contribute to this project. 
 You can improve translations, AMD GPU support, overall stability, etc.
 
+## Contribution rules
+- NO proprietary blobs in the code, we're trying to get rid of these, reference to them externally
+- Don't do massive commits
+- Your code should follow the style of our project
+- DON'T SEND AI-GENERATED SLOP, please, for the love of god
+- Try to follow the [**ROADMAP.md**](https://github.com/relativemodder/aegnux/blob/main/ROADMAP.md)
+
 ## If you're doubt about origins of binary files...
 - Wine (compiled and stripped) - official repo
 - msxml3.dll - MS Windows
