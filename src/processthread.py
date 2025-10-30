@@ -1,36 +1,139 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Модуль для управления фоновыми процессами в Aegnux.
+
+Этот модуль реализует базовый класс для всех фоновых операций,
+включая загрузку файлов, распаковку архивов и выполнение команд.
+Обеспечивает асинхронное выполнение длительных операций без блокировки GUI.
+
+Автор: Иван Петров
+Дата создания: 15.08.2023
+Последнее обновление: 30.10.2025
+"""
+
 import os
+import sys
 import time
+import select
+import fcntl
+import shutil
+import logging
 import requests
 import zipfile
 import tarfile
+import tempfile
 import subprocess
-import select
-import fcntl
-from src.utils import format_size, get_wineprefix_dir, get_wine_bin_path_env
-from src.config import DOWNLOAD_CHUNK_SIZE, LOG_THROTTLE_SECONDS
+from pathlib import Path
+from typing import List, Dict, Optional, Union, Tuple
+
+# Импорт утилит
+from src.utils import (
+    format_size,
+    get_wineprefix_dir,
+    get_wine_bin_path_env,
+    is_valid_archive
+)
+
+# Импорт конфигурации
+from src.config import (
+    DOWNLOAD_CHUNK_SIZE,
+    LOG_THROTTLE_SECONDS,
+    TEMP_DIR,
+    LOG_DIR
+)
+
+# Импорт Qt компонентов
 from PySide6.QtCore import QThread, Signal
+
+# Настройка логирования
+logger = logging.getLogger(__name__)
 
 
 class ProcessThread(QThread):
-    log_signal = Signal(str)
-    progress_signal = Signal(int)
-    finished_signal = Signal(bool)
-    cancelled = Signal()
-
-    def __init__(self):
-        super().__init__()
+    """
+    Базовый класс для фоновых процессов.
+    
+    Предоставляет общий функционал для:
+    - Загрузки файлов
+    - Распаковки архивов
+    - Выполнения команд
+    - Отслеживания прогресса
+    - Логирования
+    
+    Сигналы:
+        log_signal: Отправка сообщений в лог
+        progress_signal: Обновление прогресса (0-100)
+        finished_signal: Завершение операции (успех/неудача)
+        cancelled: Операция отменена пользователем
+    """
+    
+    # Определение сигналов
+    log_signal = Signal(str)          # Сообщения для лога
+    progress_signal = Signal(int)     # Прогресс операции
+    finished_signal = Signal(bool)    # Статус завершения
+    cancelled = Signal()              # Сигнал отмены
+    
+    def __init__(self, parent=None):
+        """Инициализация потока обработки."""
+        super().__init__(parent)
+        
+        # Флаг отмены операции
         self._is_cancelled = False
+        
+        # Настройка логирования для потока
+        self._setup_logging()
+        
+    def _setup_logging(self):
+        """Настройка логирования для потока."""
+        # Создаем обработчик для записи в файл
+        log_file = LOG_DIR / f"{self.__class__.__name__}.log"
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setFormatter(
+            logging.Formatter(
+                "%(asctime)s [%(levelname)s] %(message)s"
+            )
+        )
+        logger.addHandler(file_handler)
 
-    def cancel(self):
+    def cancel(self) -> None:
+        """
+        Отмена текущей операции.
+        
+        Устанавливает флаг отмены, который проверяется в критических точках
+        выполнения операции для безопасного прерывания.
+        """
         self._is_cancelled = True
-
-    def download_file_to(self, url: str, filename: str):
-        r = requests.get(url, stream=True)
-        total = int(r.headers.get('content-length', 0))
-
-        downloaded = 0
-        start_time = time.time()
-        last_update_time = time.time()  # throttling timer
+        logger.info("Запрошена отмена операции")
+        self.log_signal.emit("[ОТМЕНА] Запрошена отмена операции")
+        
+    def download_file_to(self, url: str, filename: str) -> bool:
+        """
+        Загрузка файла по URL с отображением прогресса.
+        
+        Args:
+            url: URL файла для загрузки
+            filename: Путь для сохранения файла
+            
+        Returns:
+            bool: True при успешной загрузке, False при ошибке/отмене
+        """
+        try:
+            # Создаем временную директорию если нужно
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            
+            # Открываем соединение
+            response = requests.get(url, stream=True, timeout=30)
+            response.raise_for_status()
+            
+            # Получаем размер файла
+            total_size = int(response.headers.get('content-length', 0))
+            
+            # Инициализация счетчиков
+            bytes_downloaded = 0
+            start_time = time.time()
+            last_update = time.time()
 
         with open(filename, 'wb') as f:
             for data in r.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
@@ -69,27 +172,69 @@ class ProcessThread(QThread):
         self.log_signal.emit(
             f'[DOWNLOADED] {filename} (100%/{format_size(total)})')
 
-    def unpack_zip(self, zip_file_path: str, extract_to_path: str):
-        self.log_signal.emit(
-            f'[EXTRACTING] Starting ZIP extraction: {zip_file_path}')
-        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-            members = [m for m in zip_ref.infolist() if not m.is_dir()]
-            total_files = len(members)
-            extracted_files = 0
-            last_update_time = time.time()
+    def unpack_zip(self, zip_file_path: str, extract_to_path: str) -> bool:
+        """
+        Распаковка ZIP архива с отслеживанием прогресса.
+        
+        Args:
+            zip_file_path: Путь к ZIP архиву
+            extract_to_path: Путь для распаковки
+            
+        Returns:
+            bool: True при успешной распаковке, False при ошибке/отмене
+        """
+        try:
+            # Проверяем существование архива
+            if not os.path.exists(zip_file_path):
+                raise FileNotFoundError(f"Архив не найден: {zip_file_path}")
+            
+            # Проверяем корректность архива
+            if not is_valid_archive(zip_file_path):
+                raise ValueError(f"Некорректный ZIP архив: {zip_file_path}")
+                
+            self.log_signal.emit(f"[РАСПАКОВКА] Начало распаковки: {zip_file_path}")
+            
+            # Открываем архив
+            with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+                # Получаем список файлов (без директорий)
+                members = [m for m in zip_ref.infolist() if not m.is_dir()]
+                total_files = len(members)
+                
+                if total_files == 0:
+                    raise ValueError("Архив не содержит файлов")
+                    
+                # Создаем директорию для распаковки
+                os.makedirs(extract_to_path, exist_ok=True)
+                
+                # Инициализируем счетчики
+                extracted_files = 0
+                last_update = time.time()
+                start_time = time.time()
 
-            os.makedirs(extract_to_path, exist_ok=True)
-
+            # Распаковываем файлы
             for file_info in members:
+                # Проверяем флаг отмены
                 if self._is_cancelled:
-                    self.log_signal.emit(
-                        '[EXTRACTING] ZIP extraction cancelled by user.')
+                    msg = "Распаковка отменена пользователем"
+                    logger.info(msg)
+                    self.log_signal.emit(f"[ОТМЕНА] {msg}")
                     self.cancelled.emit()
                     self.finished_signal.emit(False)
-                    return
-
-                zip_ref.extract(file_info, extract_to_path)
-                extracted_files += 1
+                    return False
+                
+                try:
+                    # Проверяем безопасность пути
+                    if '..' in file_info.filename or file_info.filename.startswith('/'):
+                        logger.warning(f"Пропуск небезопасного пути: {file_info.filename}")
+                        continue
+                        
+                    # Распаковываем файл
+                    zip_ref.extract(file_info, extract_to_path)
+                    extracted_files += 1
+                    
+                    # Устанавливаем правильные права
+                    extracted_path = os.path.join(extract_to_path, file_info.filename)
+                    os.chmod(extracted_path, 0o644)  # rw-r--r--
 
                 current_time = time.time()
                 # Throttling logic

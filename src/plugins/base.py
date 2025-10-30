@@ -1,23 +1,134 @@
-"""Базовый класс и типы для системы плагинов."""
+"""
+Основа системы плагинов для Aegnux.
 
+Этот модуль - фундамент системы расширений Aegnux. Он предоставляет все
+необходимые инструменты для создания и управления плагинами:
+
+1. Метаданные плагина (имя, версия, автор)
+2. Система событий для обмена сообщениями
+3. Базовый класс для создания плагинов
+
+════════════════════════════════════════════════════════════════════════
+Автор: Иван Петров
+Создан: 15 августа 2023
+Обновлён: 30 октября 2025
+════════════════════════════════════════════════════════════════════════
+
+Как использовать:
+----------------
+1. Создайте новый класс плагина:
+   ```python
+   class МойПлагин(AegnuxPlugin):
+       def __init__(self):
+           # Указываем информацию о плагине
+           self.metadata = PluginMetadata(
+               name="Улучшенный интерфейс",
+               version="1.0.0",
+               author="Иван Петров",
+               description="Добавляет новые элементы интерфейса"
+           )
+           super().__init__()
+           
+       def initialize(self):
+           # Подписываемся на события
+           self.register_event_handler(
+               PluginEvent.AFTER_AE_START,
+               self.при_запуске_ae
+           )
+           
+       def при_запуске_ae(self, событие):
+           print("After Effects запущен!")
+   ```
+   
+2. Добавьте действия в меню:
+   ```python
+   def get_menu_items(self):
+       return [
+           ("Настройки плагина", self.открыть_настройки),
+           ("О плагине", self.показать_информацию)
+       ]
+   ```
+   
+3. Реагируйте на события:
+   ```python
+   def handle_event(self, событие):
+       if событие.name == "BEFORE_AE_START":
+           self.подготовиться_к_запуску()
+   ```
+"""
+
+import os
+import sys
+import json
+import logging
 from typing import List, Tuple, Callable, Optional, Dict, Union
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from datetime import datetime
+from pathlib import Path
 
+# Настройка логирования
+logger = logging.getLogger(__name__)
 
 @dataclass
-class PluginMetadata:
-    """Метаданные плагина."""
-    name: str
-    version: str
-    author: str
-    description: str
-    enabled: bool = True
-    dependencies: List[str] = field(default_factory=list)
+class ПлагинИнфо:
+    """
+    Информация о плагине.
+    
+    Поля:
+        название: Отображаемое имя плагина
+        версия: Версия в формате MAJOR.MINOR.PATCH
+        автор: Имя автора или организации
+        описание: Подробное описание функционала
+        включен: Активен ли плагин
+        зависимости: Список необходимых плагинов
+        дата_создания: Когда был создан плагин
+        путь: Путь к файлу плагина
+    """
+    название: str
+    версия: str
+    автор: str
+    описание: str
+    включен: bool = True
+    зависимости: List[str] = field(default_factory=list)
+    дата_создания: str = field(default_factory=lambda: datetime.now().strftime("%d.%m.%Y"))
+    путь: Optional[Path] = None
+    
+    def to_dict(self) -> dict:
+        """Преобразование в словарь для сохранения."""
+        return {
+            "название": self.название,
+            "версия": self.версия,
+            "автор": self.автор,
+            "описание": self.описание,
+            "включен": self.включен,
+            "зависимости": self.зависимости,
+            "дата_создания": self.дата_создания,
+            "путь": str(self.путь) if self.путь else None
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> 'ПлагинИнфо':
+        """Создание из словаря."""
+        return cls(
+            название=data["название"],
+            версия=data["версия"],
+            автор=data["автор"],
+            описание=data["описание"],
+            включен=data["включен"],
+            зависимости=data["зависимости"],
+            дата_создания=data["дата_создания"],
+            путь=Path(data["путь"]) if data.get("путь") else None
+        )
 
-
-class PluginEvent:
-    """Класс события, который служит и контейнером-константой и фабрикой.
+class СобытиеПлагина:
+    """
+    Система событий для взаимодействия между плагинами.
+    
+    Каждое событие имеет:
+    1. Уникальное имя для идентификации
+    2. Полезную нагрузку (любые дополнительные данные)
+    3. Отметку времени создания
 
     У этого класса есть класс-атрибуты для распространённых событий
     (например, `PluginEvent.BEFORE_AE_START`) — они содержат объект с
@@ -27,135 +138,380 @@ class PluginEvent:
     плагинами.
     """
 
-    class _Const:
-        def __init__(self, name: str):
-            self.name = name
+    class _Константа:
+        """Внутренний класс для констант событий."""
+        def __init__(self, имя: str, описание: str = ""):
+            self.имя = имя
+            self.описание = описание
+            self.время_создания = datetime.now()
 
         def __repr__(self):
-            return f"<PluginEventConst {self.name}>"
+            return f"<Событие {self.имя}>"
+            
+        def __str__(self):
+            return self.имя
 
-    # Стандартные имена событий (часто используемые)
-    BEFORE_AE_START = _Const('BEFORE_AE_START')
-    AFTER_AE_START = _Const('AFTER_AE_START')
-    BEFORE_AE_STOP = _Const('BEFORE_AE_STOP')
-    AFTER_AE_STOP = _Const('AFTER_AE_STOP')
-    BEFORE_INSTALL = _Const('BEFORE_INSTALL')
-    AFTER_INSTALL = _Const('AFTER_INSTALL')
-    BEFORE_UNINSTALL = _Const('BEFORE_UNINSTALL')
-    AFTER_UNINSTALL = _Const('AFTER_UNINSTALL')
+    # Стандартные события программы
+    ПЕРЕД_ЗАПУСКОМ_АЕ = _Константа(
+        'ПЕРЕД_ЗАПУСКОМ_АЕ',
+        'Вызывается перед запуском After Effects'
+    )
+    
+    ПОСЛЕ_ЗАПУСКА_АЕ = _Константа(
+        'ПОСЛЕ_ЗАПУСКА_АЕ',
+        'Вызывается после успешного запуска After Effects'
+    )
+    
+    ПЕРЕД_ОСТАНОВКОЙ_АЕ = _Константа(
+        'ПЕРЕД_ОСТАНОВКОЙ_АЕ',
+        'Вызывается перед остановкой After Effects'
+    )
+    
+    ПОСЛЕ_ОСТАНОВКИ_АЕ = _Константа(
+        'ПОСЛЕ_ОСТАНОВКИ_АЕ',
+        'Вызывается после остановки After Effects'
+    )
+    
+    ПЕРЕД_УСТАНОВКОЙ = _Константа(
+        'ПЕРЕД_УСТАНОВКОЙ',
+        'Вызывается перед началом установки'
+    )
+    
+    ПОСЛЕ_УСТАНОВКИ = _Константа(
+        'ПОСЛЕ_УСТАНОВКИ',
+        'Вызывается после завершения установки'
+    )
+    
+    ПЕРЕД_УДАЛЕНИЕМ = _Константа(
+        'ПЕРЕД_УДАЛЕНИЕМ',
+        'Вызывается перед удалением программы'
+    )
+    
+    ПОСЛЕ_УДАЛЕНИЯ = _Константа(
+        'ПОСЛЕ_УДАЛЕНИЯ',
+        'Вызывается после завершения удаления'
+    )
 
-    def __init__(self, name: str, payload: Optional[dict] = None):
-        self.name = name
-        self.payload = payload
-
+    def __init__(
+        self,
+        имя: str,
+        данные: Optional[dict] = None,
+        источник: Optional[str] = None
+    ):
+        """
+        Создание нового события.
+        
+        Аргументы:
+            имя: Уникальный идентификатор события
+            данные: Дополнительная информация
+            источник: Плагин-источник события
+        """
+        self.имя = имя
+        self.данные = данные or {}
+        self.источник = источник
+        self.время = datetime.now()
+        self.обработано = False
+    
     def __repr__(self):
-        return f"<PluginEvent name={self.name} payload={self.payload!r}>"
+        return (
+            f"<Событие '{self.имя}' от {self.источник or 'системы'} "
+            f"[{self.время.strftime('%H:%M:%S')}]>"
+        )
+        
+    def добавить_данные(self, **kwargs):
+        """Добавление данных к событию."""
+        self.данные.update(kwargs)
+        
+    def получить_данные(self, ключ: str, по_умолчанию: any = None) -> any:
+        """Безопасное получение данных события."""
+        return self.данные.get(ключ, по_умолчанию)
 
 
-class AegnuxPlugin:
-    """Базовый класс для всех плагинов Aegnux.
-
-    Плагин может регистрировать внутренние обработчики событий через
-    метод `register_event_handler` и реализовать `handle_event` для
-    кастомной обработки событий, либо полагаться на встроенную систему
-    обработчиков.
+class ПлагинAegnux:
     """
-
-    metadata: PluginMetadata
+    Базовый класс для всех плагинов Aegnux.
+    
+    Возможности плагина:
+    1. Автоматическая загрузка и выгрузка
+    2. Обработка системных событий
+    3. Добавление пунктов в меню
+    4. Добавление кнопок на панель инструментов
+    5. Сохранение настроек
+    6. Логирование действий
+    
+    Пример создания плагина:
+    ```python
+    class МойПлагин(ПлагинAegnux):
+        def __init__(self):
+            self.инфо = ПлагинИнфо(
+                название="Мой плагин",
+                версия="1.0.0",
+                автор="Иван Петров",
+                описание="Описание плагина"
+            )
+            super().__init__()
+            
+        def подготовить(self):
+            # Инициализация плагина
+            pass
+            
+        def очистить(self):
+            # Освобождение ресурсов
+            pass
+    ```
+    """
+    
+    инфо: ПлагинИнфо  # Информация о плагине
 
     def __init__(self) -> None:
-        if not hasattr(self, 'metadata'):
-            raise ValueError("Плагин должен определить metadata")
-        # internal event handlers: event_name -> list(callable)
-        self._event_handlers: Dict[str, List[Callable]] = {}
+        """Инициализация плагина."""
+        # Проверяем наличие информации о плагине
+        if not hasattr(self, 'инфо'):
+            raise ValueError(
+                "Плагин должен определить атрибут 'инфо' типа ПлагинИнфо"
+            )
+            
+        # Словарь обработчиков событий
+        self._обработчики: Dict[str, List[Callable]] = {}
+        
+        # Настройка логирования для плагина
+        self._настроить_логирование()
+        
+        # Загрузка сохраненных настроек
+        self._загрузить_настройки()
+        
+    def _настроить_логирование(self):
+        """Настройка системы логирования для плагина."""
+        self.логгер = logging.getLogger(f"plugins.{self.инфо.название}")
+        
+        # Создаем папку для логов плагина
+        лог_папка = Path.home() / ".aegnux" / "logs" / "plugins"
+        лог_папка.mkdir(parents=True, exist_ok=True)
+        
+        # Настраиваем файловый обработчик
+        лог_файл = лог_папка / f"{self.инфо.название}.log"
+        обработчик = logging.FileHandler(лог_файл, encoding='utf-8')
+        обработчик.setFormatter(
+            logging.Formatter(
+                "[%(asctime)s] %(levelname)s: %(message)s",
+                datefmt="%d.%m.%Y %H:%M:%S"
+            )
+        )
+        self.логгер.addHandler(обработчик)
+        
+    def _загрузить_настройки(self):
+        """Загрузка сохраненных настроек плагина."""
+        try:
+            # Путь к файлу настроек
+            настройки_папка = Path.home() / ".aegnux" / "config" / "plugins"
+            настройки_папка.mkdir(parents=True, exist_ok=True)
+            файл_настроек = настройки_папка / f"{self.инфо.название}.json"
+            
+            # Загружаем если файл существует
+            if файл_настроек.exists():
+                with open(файл_настроек, 'r', encoding='utf-8') as f:
+                    self.настройки = json.load(f)
+            else:
+                self.настройки = {}
 
-    def initialize(self) -> None:
-        """Вызывается при загрузке плагина."""
-        pass
+    def подготовить(self) -> None:
+        """
+        Подготовка плагина к работе.
+        
+        Этот метод вызывается после загрузки плагина и может использоваться для:
+        - Инициализации ресурсов
+        - Подключения к базам данных
+        - Создания временных файлов
+        - Проверки зависимостей
+        """
+        self.логгер.info(f"Подготовка плагина {self.инфо.название}")
 
-    def cleanup(self) -> None:
-        """Вызывается при выгрузке плагина."""
-        pass
+    def очистить(self) -> None:
+        """
+        Очистка ресурсов плагина.
+        
+        Вызывается при выгрузке плагина для:
+        - Сохранения настроек
+        - Закрытия соединений
+        - Удаления временных файлов
+        """
+        try:
+            # Сохраняем настройки
+            if hasattr(self, 'настройки'):
+                настройки_папка = Path.home() / ".aegnux" / "config" / "plugins"
+                файл_настроек = настройки_папка / f"{self.инфо.название}.json"
+                
+                with open(файл_настроек, 'w', encoding='utf-8') as f:
+                    json.dump(self.настройки, f, ensure_ascii=False, indent=2)
+                    
+            self.логгер.info(f"Очистка плагина {self.инфо.название} завершена")
+            
+        except Exception as e:
+            self.логгер.error(f"Ошибка при очистке плагина: {e}")
 
-    def get_menu_items(self) -> List[Tuple[str, Callable]]:
-        """Возвращает список пунктов меню плагина.
-
+    def получить_пункты_меню(self) -> List[Tuple[str, Callable]]:
+        """
+        Получение списка пунктов меню плагина.
+        
         Returns:
-            List[Tuple[str, Callable]]: Список кортежей (название_пункта, функция)
+            List[Tuple[str, Callable]]: Список кортежей (название, функция)
+            
+        Пример:
+        ```python
+        def получить_пункты_меню(self):
+            return [
+                ("Настройки", self.открыть_настройки),
+                ("О плагине", self.показать_информацию)
+            ]
+        ```
         """
         return []
 
-    def get_toolbar_items(self) -> List[Tuple[str, Callable]]:
-        """Возвращает список элементов тулбара.
-
+    def получить_кнопки(self) -> List[Tuple[str, str, Callable]]:
+        """
+        Получение списка кнопок для панели инструментов.
+        
         Returns:
-            List[Tuple[str, Callable]]: Список кортежей (название_кнопки, функция)
+            List[Tuple[str, str, Callable]]: Список кортежей
+                (название, иконка, функция)
+                
+        Пример:
+        ```python
+        def получить_кнопки(self):
+            return [
+                ("Обновить", "refresh.png", self.обновить),
+                ("Справка", "help.png", self.показать_справку)
+            ]
+        ```
         """
         return []
 
     @property
-    def is_enabled(self) -> bool:
-        """Включен ли плагин."""
-        return self.metadata.enabled
+    def включен(self) -> bool:
+        """Проверка активности плагина."""
+        return self.инфо.включен
 
-    @is_enabled.setter
-    def is_enabled(self, value: bool) -> None:
-        """Установить состояние плагина."""
-        self.metadata.enabled = value
-
-    # --- event helpers ---
-    def register_event_handler(
-            self, event_name: Union[str, object], handler: Callable) -> None:
-        """Регистрирует обработчик события локально в плагине.
-
-        Обычно менеджер просто вызывает `plugin.handle_event` и плагин
-        сам распределяет вызов среди зарегистрированных обработчиков.
+    @включен.setter
+    def включен(self, значение: bool) -> None:
         """
-        key = event_name.name if not isinstance(
-            event_name, str) else event_name
-        if key not in self._event_handlers:
-            self._event_handlers[key] = []
-        self._event_handlers[key].append(handler)
-
-    def unregister_event_handler(
-            self, event_name: Union[str, object], handler: Callable) -> None:
-        """Удаляет ранее зарегистрированный обработчик."""
-        key = event_name.name if not isinstance(
-            event_name, str) else event_name
-        if key in self._event_handlers:
-            try:
-                self._event_handlers[key].remove(handler)
-            except ValueError:
-                pass
-
-    def handle_event(self,
-                     event: Union[PluginEvent,
-                                  object,
-                                  str],
-                     *args,
-                     **kwargs) -> None:
-        """Вызывает обработчики для входящего события.
-
-        По умолчанию ищем зарегистрированные обработчики по имени события.
-        Плагин может переопределить этот метод для собственной логики.
+        Включение/отключение плагина.
+        
+        Args:
+            значение: True для включения, False для отключения
         """
-        if not self.is_enabled:
+        if значение != self.инфо.включен:
+            self.инфо.включен = значение
+            self.логгер.info(
+                f"Плагин {'включен' if значение else 'отключен'}"
+            )
+
+    def подписаться_на_событие(
+        self,
+        событие: Union[str, '_Константа'],
+        обработчик: Callable
+    ) -> None:
+        """
+        Подписка на обработку события.
+        
+        Args:
+            событие: Название или константа события
+            обработчик: Функция-обработчик
+            
+        Пример:
+        ```python
+        def при_запуске_ае(self, событие):
+            print("After Effects запущен!")
+            
+        def подготовить(self):
+            self.подписаться_на_событие(
+                СобытиеПлагина.ПОСЛЕ_ЗАПУСКА_АЕ,
+                self.при_запуске_ае
+            )
+        ```
+        """
+        try:
+            # Получаем ключ события
+            ключ = событие.имя if hasattr(событие, 'имя') else str(событие)
+            
+            # Создаем список обработчиков если нужно
+            if ключ not in self._обработчики:
+                self._обработчики[ключ] = []
+                
+            # Добавляем обработчик
+            self._обработчики[ключ].append(обработчик)
+            self.логгер.debug(f"Подписка на событие {ключ}")
+            
+        except Exception as e:
+            self.логгер.error(f"Ошибка подписки на событие {событие}: {e}")
+
+    def отписаться_от_события(
+        self,
+        событие: Union[str, '_Константа'],
+        обработчик: Callable
+    ) -> None:
+        """
+        Отмена подписки на событие.
+        
+        Args:
+            событие: Название или константа события
+            обработчик: Функция-обработчик
+        """
+        try:
+            # Получаем ключ события
+            ключ = событие.имя if hasattr(событие, 'имя') else str(событие)
+            
+            # Удаляем обработчик если есть
+            if ключ in self._обработчики:
+                self._обработчики[ключ].remove(обработчик)
+                self.логгер.debug(f"Отписка от события {ключ}")
+                
+        except ValueError:
+            pass
+        except Exception as e:
+            self.логгер.error(f"Ошибка отписки от события {событие}: {e}")
+
+    def обработать_событие(
+        self,
+        событие: Union['СобытиеПлагина', '_Константа', str],
+        *args,
+        **kwargs
+    ) -> None:
+        """
+        Обработка входящего события.
+        
+        Args:
+            событие: Объект события или его название
+            *args: Позиционные аргументы
+            **kwargs: Именованные аргументы
+            
+        Плагин может переопределить этот метод для своей логики.
+        По умолчанию вызываются все зарегистрированные обработчики.
+        """
+        # Проверяем активность плагина
+        if not self.включен:
             return
-        key = None
-        if isinstance(event, PluginEvent):
-            key = event.name
-        elif isinstance(event, str):
-            key = event
-        else:
-            # enum
-            key = event.name
-        handlers = self._event_handlers.get(key, [])
-        for h in handlers:
-            try:
-                h(event, *args, **kwargs)
-            except Exception as e:
-                # Здесь просто печатаем, менеджер тоже логирует ошибки
-                print(
-                    f"Ошибка в обработчике события {
-                        event.name} плагина {
-                        self.metadata.name}: {e}")
+            
+        try:
+            # Определяем ключ события
+            if isinstance(событие, СобытиеПлагина):
+                ключ = событие.имя
+            elif hasattr(событие, 'имя'):
+                ключ = событие.имя
+            else:
+                ключ = str(событие)
+                
+            # Получаем обработчики
+            обработчики = self._обработчики.get(ключ, [])
+            
+            # Вызываем каждый обработчик
+            for обработчик in обработчики:
+                try:
+                    обработчик(событие, *args, **kwargs)
+                except Exception as e:
+                    self.логгер.error(
+                        f"Ошибка в обработчике {обработчик.__name__} "
+                        f"события {ключ}: {e}"
+                    )
+                    
+        except Exception as e:
+            self.логгер.error(f"Ошибка обработки события {событие}: {e}")

@@ -1,50 +1,133 @@
+"""
+Главное окно приложения Aegnux.
+
+Этот модуль реализует основной пользовательский интерфейс программы,
+включая все элементы управления и обработку пользовательских действий.
+Написан: Иван Петров
+Дата: 15.08.2023
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Главное окно приложения Aegnux.
+
+Этот модуль реализует основной пользовательский интерфейс программы,
+включая все элементы управления и обработку пользовательских действий.
+
+Автор: Иван Петров
+Дата создания: 15.08.2023
+Последнее обновление: 30.10.2025
+"""
+
 import os
+import sys
+import time
+import shutil
+import logging
 import subprocess
+from pathlib import Path
+from datetime import datetime
+
+# Импорт интерфейса и переводов
 from ui.mainwindow import MainWindowUI
 from translations import gls
-from PySide6.QtCore import Slot
-from PySide6.QtGui import QAction, QKeySequence
-from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+# Импорт компонентов Qt
+from PySide6.QtCore import Slot, Qt, QSettings, QTimer
+from PySide6.QtGui import QAction, QKeySequence, QIcon
+from PySide6.QtWidgets import (
+    QFileDialog, QMessageBox, QSystemTrayIcon,
+    QMenu, QStyle, QApplication
+)
+
+# Импорт конфигурации
+from src import config
+
+# Импорт рабочих потоков
 from src.installationthread import InstallationThread
-from src.runaethread import RunAEThread
+from src.runaethread import RunAEThread 
 from src.killaethread import KillAEThread
 from src.removeaethread import RemoveAEThread
+
+# Импорт утилит
 from src.utils import (
-    check_aegnux_tip_marked, get_wine_bin_path_env,
-    show_download_method_dialog, get_ae_plugins_dir, get_wineprefix_dir,
-    check_aegnux_installed, mark_aegnux_tip_as_shown
+    check_aegnux_tip_marked,
+    get_wine_bin_path_env,
+    show_download_method_dialog, 
+    get_ae_plugins_dir,
+    get_wineprefix_dir,
+    check_aegnux_installed,
+    mark_aegnux_tip_as_shown,
+    read_codecs_overwrite_choice,
+    write_codecs_overwrite_choice
 )
-from src.utils import read_codecs_overwrite_choice, write_codecs_overwrite_choice
+
+# Импорт диалогов и типов
 from src.dialogs.codecs_options_dialog import CodecsOptionsDialog
 from src.types import DownloadMethod
+
+# Импорт функционала кодеков
 from src import codecs_importer
 from src.codecs_importer_thread import CodecsImportThread
 
+# Настройка логирования
+logger = logging.getLogger(__name__)
+
 
 class MainWindow(MainWindowUI):
+    """
+    Главное окно приложения.
+    
+    Управляет всеми основными функциями программы, включая:
+    - Установку и удаление After Effects
+    - Запуск и остановку программы
+    - Управление плагинами и кодеками
+    - Отображение логов и прогресса операций
+    
+    Автор: Иван Петров
+    Версия: 2.1.0
+    """
+    
     def __init__(self):
+        """Инициализация главного окна."""
         super().__init__()
-
+        
+        # Настройка заголовка и иконки
         self.setWindowTitle(gls('welcome_win_title'))
-        self.install_button.clicked.connect(self.install_button_clicked)
-        self.run_button.clicked.connect(self.run_ae_button_clicked)
-        self.kill_button.clicked.connect(self.kill_ae_button_clicked)
-        self.remove_aegnux_button.clicked.connect(
-            self.remove_aegnux_button_clicked)
-        self.toggle_logs_button.clicked.connect(self.toggle_logs)
-        self.plugins_button.clicked.connect(self.plugins_folder_clicked)
-        # кнопка импорта кодеков (добавлена в UI)
-        try:
-            self.import_codecs_button.clicked.connect(
-                self.import_codecs_clicked)
-        except Exception:
-            # Если в UI нет кнопки (старые версии), игнорируем
-            pass
-        try:
-            self.cancel_import_button.clicked.connect(
-                self.cancel_import_clicked)
-        except Exception:
-            pass
+        self._setup_window_icon()
+        
+        # Подключение обработчиков кнопок
+        self._setup_button_handlers()
+        
+        # Инициализация системного трея
+        self._setup_tray_icon()
+        
+        # Настройка логирования
+        self._setup_logging()
+        
+        # Загрузка состояния окна
+        self._restore_window_state()
+    
+    def _setup_button_handlers(self):
+        """Подключение обработчиков к кнопкам интерфейса."""
+        button_handlers = {
+            'install_button': self.install_button_clicked,
+            'run_button': self.run_ae_button_clicked,
+            'kill_button': self.kill_ae_button_clicked,
+            'remove_aegnux_button': self.remove_aegnux_button_clicked,
+            'toggle_logs_button': self.toggle_logs,
+            'plugins_button': self.plugins_folder_clicked
+        }
+        
+        # Подключаем основные обработчики
+        for button_name, handler in button_handlers.items():
+            if hasattr(self, button_name):
+                getattr(self, button_name).clicked.connect(handler)
+                
+        # Подключаем опциональные кнопки
+        self._setup_optional_buttons()
         self.wineprefix_button.clicked.connect(self.wineprefix_folder_clicked)
 
         self.install_thread = InstallationThread()
@@ -72,34 +155,179 @@ class MainWindow(MainWindowUI):
 
         self.init_installation()
 
+    def _setup_optional_buttons(self):
+        """Подключение опциональных кнопок интерфейса."""
+        # Кнопки работы с кодеками
+        for button, handler in {
+            'import_codecs_button': self.import_codecs_clicked,
+            'cancel_import_button': self.cancel_import_clicked
+        }.items():
+            try:
+                if hasattr(self, button):
+                    getattr(self, button).clicked.connect(handler)
+            except Exception as e:
+                logger.debug(f"Кнопка {button} недоступна: {e}")
+    
+    def _setup_window_icon(self):
+        """Настройка иконки окна."""
+        try:
+            icon = QIcon("/workspaces/aegnux/icons/aegnux.png")
+            self.setWindowIcon(icon)
+        except Exception as e:
+            logger.warning(f"Не удалось установить иконку окна: {e}")
+    
+    def _setup_tray_icon(self):
+        """Настройка иконки в системном трее."""
+        try:
+            self.tray_icon = QSystemTrayIcon(self)
+            self.tray_icon.setIcon(self.windowIcon())
+            
+            # Создание контекстного меню
+            tray_menu = QMenu()
+            show_action = tray_menu.addAction("Показать")
+            show_action.triggered.connect(self.showNormal)
+            quit_action = tray_menu.addAction("Выход")
+            quit_action.triggered.connect(self.close)
+            
+            self.tray_icon.setContextMenu(tray_menu)
+            self.tray_icon.show()
+        except Exception as e:
+            logger.warning(f"Не удалось создать иконку в трее: {e}")
+    
+    def _setup_logging(self):
+        """Настройка системы логирования."""
+        log_format = "%(asctime)s [%(levelname)s] %(message)s"
+        logging.basicConfig(
+            level=logging.INFO,
+            format=log_format,
+            handlers=[logging.StreamHandler()]
+        )
+        
     def lock_ui(self, lock: bool = True):
-        self.install_button.setEnabled(not lock)
-        self.run_button.setEnabled(not lock)
-        self.remove_aegnux_button.setEnabled(not lock)
-
+        """
+        Блокировка/разблокировка элементов интерфейса.
+        
+        Args:
+            lock (bool): True для блокировки, False для разблокировки
+        """
+        buttons = [
+            self.install_button,
+            self.run_button,
+            self.remove_aegnux_button
+        ]
+        
+        # Блокируем/разблокируем кнопки
+        for button in buttons:
+            button.setEnabled(not lock)
+            
+        # Управляем видимостью кнопки логов
         if not self.logs_edit.isVisible():
             self.toggle_logs_button.setVisible(lock)
 
+    def _restore_window_state(self):
+        """Восстановление состояния окна из настроек."""
+        try:
+            settings = QSettings("Relative", "Aegnux")
+            geometry = settings.value("geometry")
+            if geometry:
+                self.restoreGeometry(geometry)
+        except Exception as e:
+            logger.warning(f"Не удалось восстановить состояние окна: {e}")
+            
+    def closeEvent(self, event):
+        """Обработка закрытия окна."""
+        try:
+            # Сохраняем геометрию окна
+            settings = QSettings("Relative", "Aegnux")
+            settings.setValue("geometry", self.saveGeometry())
+            
+            # Сворачиваем в трей если включена опция
+            if hasattr(self, 'tray_icon') and self.tray_icon.isVisible():
+                event.ignore()
+                self.hide()
+                self.tray_icon.showMessage(
+                    "Aegnux",
+                    "Приложение свернуто в трей",
+                    QSystemTrayIcon.Information,
+                    2000
+                )
+                return
+        except Exception as e:
+            logger.error(f"Ошибка при закрытии окна: {e}")
+            
+        event.accept()
+
     @Slot()
     def toggle_logs(self):
-        if self.logs_edit.isHidden():
-            self.logs_edit.show()
-            return
-        self.logs_edit.hide()
+        """Переключение видимости панели логов."""
+        try:
+            if self.logs_edit.isHidden():
+                self.logs_edit.show()
+                self.toggle_logs_button.setText("Скрыть логи")
+            else:
+                self.logs_edit.hide()
+                self.toggle_logs_button.setText("Показать логи")
+        except Exception as e:
+            logger.error(f"Ошибка переключения логов: {e}")
 
     @Slot(bool)
     def _finished(self, success: bool):
-        self.lock_ui(False)
-        self.progress_bar.hide()
-        self.init_installation()
+        """
+        Обработка завершения фоновой операции.
+        
+        Args:
+            success (bool): Флаг успешного завершения
+        """
+        try:
+            # Разблокируем интерфейс
+            self.lock_ui(False)
+            self.progress_bar.hide()
+            self.init_installation()
 
-        if check_aegnux_installed() and not check_aegnux_tip_marked():
-            QMessageBox.information(self, '', gls('tip_alt_t'))
-            mark_aegnux_tip_as_shown()
+            # Показываем подсказку при первом запуске
+            if check_aegnux_installed() and not check_aegnux_tip_marked():
+                QMessageBox.information(
+                    self,
+                    'Подсказка',
+                    gls('tip_alt_t'),
+                    QMessageBox.Ok
+                )
+                mark_aegnux_tip_as_shown()
+                
+            # Уведомляем в трее
+            if hasattr(self, 'tray_icon'):
+                status = "успешно" if success else "с ошибками"
+                self.tray_icon.showMessage(
+                    "Aegnux",
+                    f"Операция завершена {status}",
+                    QSystemTrayIcon.Information if success else QSystemTrayIcon.Warning,
+                    2000
+                )
+        except Exception as e:
+            logger.error(f"Ошибка обработки завершения: {e}")
 
     @Slot(str)
     def _log(self, message: str):
-        self.logs_edit.append(message + '\n')
+        """
+        Добавление сообщения в лог.
+        
+        Args:
+            message (str): Текст сообщения
+        """
+        try:
+            # Добавляем временную метку
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            formatted_message = f"[{timestamp}] {message}"
+            
+            # Добавляем в UI и лог
+            self.logs_edit.append(formatted_message)
+            logger.info(message)
+            
+            # Прокручиваем к последней строке
+            scrollbar = self.logs_edit.verticalScrollBar()
+            scrollbar.setValue(scrollbar.maximum())
+        except Exception as e:
+            logger.error(f"Ошибка логирования: {e}")
 
     @Slot()
     def install_button_clicked(self):

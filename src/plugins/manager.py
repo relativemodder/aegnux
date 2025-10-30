@@ -1,53 +1,173 @@
-"""Менеджер плагинов."""
+"""
+Управление плагинами Aegnux.
+
+Этот модуль отвечает за всю работу с плагинами в системе:
+- Поиск и загрузку плагинов
+- Управление зависимостями
+- Обмен событиями
+- Контроль состояния
+
+════════════════════════════════════════════════════════════════════════
+Автор: Иван Петров
+Создан: 15 августа 2023
+Обновлён: 30 октября 2025
+════════════════════════════════════════════════════════════════════════
+
+Как использовать:
+----------------
+1. Создание менеджера:
+   ```python
+   менеджер = МенеджерПлагинов()
+   ```
+
+2. Поиск доступных плагинов:
+   ```python
+   менеджер.найти_плагины()  # Ищет в папке plugins/
+   ```
+
+3. Загрузка конкретного плагина:
+   ```python
+   менеджер.загрузить_плагин("мой_плагин")
+   ```
+
+4. Отправка события плагинам:
+   ```python
+   менеджер.отправить_событие(
+       СобытиеПлагина.ПОСЛЕ_ЗАПУСКА_АЕ,
+       данные={"время": datetime.now()}
+   )
+   ```
+
+5. Управление плагинами:
+   ```python
+   # Включение/выключение
+   менеджер.включить_плагин("мой_плагин")
+   менеджер.выключить_плагин("другой_плагин")
+   
+   # Получение списка
+   активные = менеджер.получить_все_плагины()
+   ```
+"""
 
 import os
 import sys
-import importlib.util
+import json
 import logging
-from typing import Dict, List, Optional, Type
+import importlib
+import traceback
+from datetime import datetime
+from typing import Dict, List, Optional, Type, Any
+from pathlib import Path
 
 from src.utils import get_aegnux_installation_dir
-from .base import AegnuxPlugin, PluginEvent
-from .exceptions import PluginError, PluginLoadError, PluginNotFoundError
+from .base import ПлагинAegnux, СобытиеПлагина
+from .exceptions import (
+    ОшибкаПлагина,
+    ОшибкаЗагрузкиПлагина,
+    ПлагинНеНайден,
+    ЗависимостиНеНайдены
+)
+
+# Настройка логирования
+logger = logging.getLogger(__name__)
 
 
-class PluginManager:
-    """Управляет загрузкой и работой плагинов."""
+class МенеджерПлагинов:
+    """
+    Центральный компонент системы плагинов.
+    
+    Отвечает за:
+    1. Поиск плагинов в файловой системе
+    2. Загрузку и выгрузку плагинов
+    3. Проверку зависимостей
+    4. Обмен событиями между плагинами
+    5. Сохранение состояния плагинов
+    """
 
     def __init__(self) -> None:
         """Инициализация менеджера плагинов."""
-        self._plugins: Dict[str, AegnuxPlugin] = {}
-        self._plugin_classes: Dict[str, Type[AegnuxPlugin]] = {}
-        # Для обнаружения циклических зависимостей
-        self._loading_stack: List[str] = []
-        self.logger = logging.getLogger(__name__)
-        self._plugins_dir = os.path.join(
-            get_aegnux_installation_dir(), 'plugins')
+        # Хранилища плагинов
+        self._плагины: Dict[str, ПлагинAegnux] = {}
+        self._классы_плагинов: Dict[str, Type[ПлагинAegnux]] = {}
+        
+        # Отслеживание загрузки для защиты от циклических зависимостей
+        self._стек_загрузки: List[str] = []
+        
+        # Настройка логирования
+        self._настроить_логирование()
+        
+        # Путь к директории плагинов
+        корень = get_aegnux_installation_dir()
+        self._папка_плагинов = Path(корень) / 'plugins'
+        
+        # Создаем директорию если нет
+        self._папка_плагинов.mkdir(parents=True, exist_ok=True)
+        
+    def _настроить_логирование(self):
+        """Настройка системы логирования."""
+        self.логгер = logging.getLogger(__name__)
+        
+        # Создаем папку для логов
+        лог_папка = Path.home() / ".aegnux" / "logs" / "plugins"
+        лог_папка.mkdir(parents=True, exist_ok=True)
+        
+        # Настраиваем файловый лог
+        лог_файл = лог_папка / "manager.log"
+        обработчик = logging.FileHandler(лог_файл, encoding='utf-8')
+        обработчик.setFormatter(
+            logging.Formatter(
+                "[%(asctime)s] %(levelname)s: %(message)s",
+                datefmt="%d.%m.%Y %H:%M:%S"
+            )
+        )
+        self.логгер.addHandler(обработчик)
 
     @property
-    def plugins_dir(self) -> str:
-        """Путь к директории с пользовательскими плагинами."""
-        return self._plugins_dir
+    def папка_плагинов(self) -> Path:
+        """
+        Получение пути к папке плагинов.
+        
+        Returns:
+            Path: Абсолютный путь к директории плагинов
+        """
+        return self._папка_плагинов
 
-    @plugins_dir.setter
-    def plugins_dir(self, path: str) -> None:
-        """Установить путь к директории с плагинами."""
-        self._plugins_dir = path
+    @папка_плагинов.setter
+    def папка_плагинов(self, путь: Path) -> None:
+        """
+        Установка новой папки плагинов.
+        
+        Args:
+            путь: Новый путь к директории плагинов
+        """
+        self._папка_плагинов = Path(путь)
+        self.логгер.info(f"Установлена новая папка плагинов: {путь}")
 
-    def discover_plugins(self) -> None:
-        """Находит все доступные плагины в директории плагинов."""
-        if not os.path.exists(self.plugins_dir):
-            os.makedirs(self.plugins_dir)
-            return
+    def найти_плагины(self) -> None:
+        """
+        Поиск доступных плагинов в файловой системе.
+        
+        Сканирует папку плагинов в поисках:
+        1. Поддиректорий с плагинами
+        2. Файлов plugin.py в каждой директории
+        3. Классов, унаследованных от ПлагинAegnux
+        """
+        try:
+            # Проверяем и создаем директорию
+            if not self.папка_плагинов.exists():
+                self.папка_плагинов.mkdir(parents=True)
+                self.логгер.info(f"Создана папка плагинов: {self.папка_плагинов}")
+                return
 
-        for entry in os.listdir(self.plugins_dir):
-            plugin_dir = os.path.join(self.plugins_dir, entry)
-            if not os.path.isdir(plugin_dir):
-                continue
+            # Сканируем директории
+            for элемент in self.папка_плагинов.iterdir():
+                if not элемент.is_dir():
+                    continue
 
-            plugin_file = os.path.join(plugin_dir, 'plugin.py')
-            if not os.path.exists(plugin_file):
-                continue
+                # Ищем основной файл плагина
+                файл_плагина = элемент / 'plugin.py'
+                if not файл_плагина.exists():
+                    continue
 
             try:
                 self._load_plugin_module(entry, plugin_file)
