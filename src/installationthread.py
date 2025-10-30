@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import shutil
 from src.config import (
     AE_DOWNLOAD_URL, AE_FILENAME, 
@@ -31,6 +32,11 @@ class InstallationThread(ProcessThread):
 
     def run(self):
         try:
+            try:
+                shutil.rmtree(get_aegnux_installation_dir(), True)
+            except:
+                self.log_signal.emit(f'[WARNING] Can\'t remove existing installation.')
+
             self.progress_signal.emit(10)
 
             if self.download_method == DownloadMethod.ONLINE:
@@ -40,8 +46,34 @@ class InstallationThread(ProcessThread):
             self.progress_signal.emit(15)
 
             self.log_signal.emit(f'[DEBUG] Unpacking AE from {self.ae_filename}...')
-            self.unpack_zip(self.ae_filename, get_aegnux_installation_dir().as_posix())
-            os.rename(get_aegnux_installation_dir().joinpath('Support Files'), get_ae_install_dir())
+            aegnux_install_dir = get_aegnux_installation_dir()
+            self.unpack_zip(self.ae_filename, aegnux_install_dir.as_posix())
+
+            root_path = Path(aegnux_install_dir)
+            target_dir = Path(get_ae_install_dir())
+            source_folder_to_delete = None
+
+            self.log_signal.emit('[DEBUG] Searching for AfterFX.exe...')
+
+            for exe_path in root_path.rglob('AfterFX.exe'):
+                source_dir_to_move = exe_path.parent
+                self.log_signal.emit(f'[DEBUG] Found installation folder: {source_dir_to_move}')
+                for item in source_dir_to_move.iterdir():
+                    shutil.move(item.as_posix(), target_dir.joinpath(item.name).as_posix())
+                self.log_signal.emit(f'[DEBUG] All contents moved to {target_dir}')
+                source_folder_to_delete = source_dir_to_move.parent
+                break
+
+            if source_folder_to_delete and source_folder_to_delete != root_path:
+                self.log_signal.emit(f'[DEBUG] Removing temporary folder: {source_folder_to_delete}')
+                try:
+                    shutil.rmtree(source_folder_to_delete.as_posix())
+                    self.log_signal.emit('[DEBUG] Temporary folder removed successfully.')
+                except OSError as e:
+                    self.log_signal.emit(f'[ERROR] Failed to remove temporary folder {source_folder_to_delete}: {e}')
+            else:
+                self.log_signal.emit('[WARNING] Installation folder not found or matched root path. No folder was deleted.')
+                
             
             self.progress_signal.emit(20)
 

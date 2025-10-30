@@ -37,3 +37,7 @@ cd aegnux
 ```bash
 ./run.sh
 ```
+
+## We need help!
+You're welcome to contribute to this project. 
+You can improve translations, AMD GPU support, overall stability, etc.
