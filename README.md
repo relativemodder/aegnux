@@ -49,3 +49,5 @@ You can improve translations, AMD GPU support, overall stability, etc.
 - kitty - [Binary releases](https://github.com/kovidgoyal/kitty/releases)
 - cabextract - [Binary RPM](https://src.fedoraproject.org/rpms/cabextract)
 - winetricks - it's already the source itself.
+
+IF YOU WANT TO CHANGE THIS, you're welcome to write additional pipeline to compile these files from scratch.
