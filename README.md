@@ -41,3 +41,11 @@ cd aegnux
 ## We need help!
 You're welcome to contribute to this project. 
 You can improve translations, AMD GPU support, overall stability, etc.
+
+## If you're doubt about origins about binary files...
+- Wine (compiled and stripped) - official repo
+- msxml3.dll - MS Windows
+- Visual C++ Redist pack - [TechPowerUp](https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/)
+- kitty - [Binary releases](https://github.com/kovidgoyal/kitty/releases)
+- cabextract - [Binary RPM](https://src.fedoraproject.org/rpms/cabextract)
+- winetricks - it's already the source itself.
