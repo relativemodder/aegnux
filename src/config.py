@@ -17,8 +17,8 @@ MSXML_ZIP = BASE_DIR + '/assets/msxml3.zip'
 
 WINE_STYLE_REG = STYLES_PATH + '/wine_dark_theme.reg'
 
-AE_DOWNLOAD_URL = 'https://huggingface.co/cutefishae/AeNux-model/resolve/main/2024.zip'
-AE_PLUGINS_URL = 'https://huggingface.co/cutefishae/AeNux-model/resolve/main/aenux-require-plugin.zip'
+AE_DOWNLOAD_URL = 'i dont support piracy'
+AE_PLUGINS_URL = 'i dont support piracy either'
 
 AE_FILENAME = '/tmp/ae2024.zip'
 

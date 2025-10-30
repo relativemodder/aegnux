@@ -87,7 +87,9 @@ class MainWindow(MainWindowUI):
     
     @Slot()
     def install_button_clicked(self):
-        method = show_download_method_dialog(gls('installation_method_title'), gls('installation_method_text'))
+        # method = show_download_method_dialog(gls('installation_method_title'), gls('installation_method_text'))
+
+        method = DownloadMethod.OFFLINE
 
         if method == DownloadMethod.CANCEL:
             return
