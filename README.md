@@ -52,7 +52,7 @@ You're welcome to contribute to this project.
 You can improve translations, AMD GPU support, overall stability, etc.
 
 ## Contribution rules
-- NO proprietary blobs in the code, we're trying to get rid of these, reference to them externally
+- NO proprietary blobs in the code, we're trying to get rid of those, reference them externally
 - Don't do massive commits
 - Your code should follow the style of our project
 - DON'T SEND AI-GENERATED SLOP, please, for the love of god
