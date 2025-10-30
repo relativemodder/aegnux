@@ -11,6 +11,8 @@ A convenient way to install Adobe After Effects on Linux using Wine. Heavily ins
 [Download Flatpak](https://github.com/relativemodder/com.relative.Aegnux/releases/latest) if you want to install it on any distro.
 
 
+*If you're interested in the project's roadmap, check out **ROADMAP.md***.
+
 ## License disclaimer
 
 This project is intended for educational and experimental use only. Please respect software licensing agreements and use responsibly. The primary objective is to explore Linux compatibility for creative applications. After Effects is a commercial software developed by Adobe.
