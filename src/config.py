@@ -53,10 +53,7 @@ AE_PLUGINS_URL = "https://huggingface.co/cutefishae/AeNux-model/resolve/main/aen
 AE_FILENAME = Path("/tmp/ae2024.zip")
 DOWNLOAD_CHUNK_SIZE = 1024 * 8  # 8KB
 
-# Настройки кодеков
-CODECS_DIR = WINE_RUNNER_DIR / "win_codecs"
-CODECS_EXTENSIONS = [".dll", ".ax", ".acm", ".axf", ".axv"]
-CODECS_OVERWRITE_BY_DEFAULT = False
+
 
 # Настройки плагинов
 PLUGINS_DIR = BASE_DIR / "plugins"

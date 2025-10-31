@@ -3,3 +3,13 @@
 **/__pycache__
 builddir
 .venv
+
+kitty-*-x86_64.txz
+cabextract-*.rpm
+
+bin/*
+!bin/.gitkeep
+
+assets/wine
+assets/vcr.zip
+assets/msxml3.zip

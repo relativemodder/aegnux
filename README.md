@@ -4,10 +4,18 @@
 
 A convenient way to install Adobe After Effects on Linux using Wine. Heavily inspired by [AeNux](https://github.com/cutefishaep/AeNux) by cutefish.
 
-[Download Flatpak](https://github.com/relativemodder/com.relative.Aegnux/releases/latest) if you want to install it on any distro.
+**⚠️ SOFTWARE IS NOT IN THE RELEASE STATE**
+
+*If you're interested in the project's roadmap, check out [**ROADMAP.md**](https://github.com/relativemodder/aegnux/blob/main/ROADMAP.md)*.
+
+[Download Flatpak package](https://github.com/relativemodder/com.relative.Aegnux/releases/latest) if you want to install it on any distro.
+
+[<img src="assets/download_flatpak.png">](https://github.com/relativemodder/com.relative.Aegnux/releases/latest)
 
 
 ## License disclaimer
+
+**This project is licensed under GNU GENERAL PUBLIC LICENSE V3.**
 
 This project is intended for educational and experimental use only. Please respect software licensing agreements and use responsibly. The primary objective is to explore Linux compatibility for creative applications. After Effects is a commercial software developed by Adobe.
 
@@ -18,13 +26,13 @@ This project is intended for educational and experimental use only. Please respe
 - UI Rendering - Occasional flickering with certain plugins (e.g., Flow)
 - Memory Management - Potential crashes under heavy RAM usage (need to tweak your system config)
 
-## How to install
+## How to install natively
 
 Native installation: the only tested environment is Arch Linux on KDE Plasma Wayland.
 
 ### Install dependencies
 ```bash
-sudo pacman -Syu pyside6 python-requests # Arch Linux
+sudo pacman -Syu pyside6 python-requests unzip libarchive curl tar # Arch Linux
 ```
 
 ### Clone the repository
@@ -33,17 +41,14 @@ https://github.com/relativemodder/aegnux
 cd aegnux
 ```
 
+### Download binaries for workarounds to work
+```bash
+./prepare.sh
+```
+
 ### Run
 ```bash
 ./run.sh
 ```
 
-## Импорт кодеков из Windows
 
-Если у вас есть установленная Windows или бэкап с нужными кодеками, вы можете импортировать их в проект.
-
-- Откройте приложение и нажмите кнопку "Импорт кодеков" (рядом с "Плагины").
-- Выберите корень вашей Windows-папки (например, `C:\Windows` или папку с бэкапом).
-- Программа рекурсивно найдет файлы с расширениями `.dll`, `.ax`, `.acm` и скопирует их в `assets/wine/win_codecs`, сохранив относительную структуру.
-
-Примечание: это простое копирование файлов — убедитесь в соответствии лицензий и использовании только ваших собственных файлов.
