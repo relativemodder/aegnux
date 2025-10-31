@@ -110,6 +110,18 @@ class MainWindowUI(QMainWindow):
         self.plugins_button.setIconSize(QSize(25, 15))
         self.plugins_button.setObjectName('plugins_button')
 
+        self.import_codecs_button = QPushButton(gls('import_codecs') if hasattr(gls, '__call__') else 'Import Codecs')
+        self.import_codecs_button.setIcon(QIcon.fromTheme('folder-download'))
+        self.import_codecs_button.setIconSize(QSize(25, 15))
+        self.import_codecs_button.setObjectName('import_codecs_button')
+
+        # cancel import button (hidden until an import is running)
+        self.cancel_import_button = QPushButton(gls('cancel_import') if hasattr(gls, '__call__') else 'Cancel Import')
+        self.cancel_import_button.setIcon(QIcon.fromTheme('process-stop'))
+        self.cancel_import_button.setIconSize(QSize(25, 15))
+        self.cancel_import_button.setObjectName('cancel_import_button')
+        self.cancel_import_button.hide()
+
         self.wineprefix_button = QPushButton(gls('wineprefix'))
         self.wineprefix_button.setIcon(QIcon.fromTheme('document-open-folder'))
         self.wineprefix_button.setIconSize(QSize(25, 15))
@@ -123,6 +135,8 @@ class MainWindowUI(QMainWindow):
         action_col.addWidget(self.toggle_logs_button)
 
         folders_row.addWidget(self.plugins_button)
+        folders_row.addWidget(self.import_codecs_button)
+        folders_row.addWidget(self.cancel_import_button)
         folders_row.addWidget(self.wineprefix_button)
 
         action_col.addLayout(folders_row)
