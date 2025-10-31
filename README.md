@@ -4,13 +4,9 @@
 
 A convenient way to install Adobe After Effects on Linux using Wine. Heavily inspired by [AeNux](https://github.com/cutefishaep/AeNux) by cutefish.
 
-**⚠️ SOFTWARE IS NOT IN THE RELEASE STATE**\
-**⚠️ SOFTWARE CONTAINS BINARY BLOBS (explaination is in the bottom of this README)**
-
-**Heads up:** I'm planning on removing all of the proprietary blobs in my project and illegal AE download links too. Please be patient, or, even better, help me with this.
+**⚠️ SOFTWARE IS NOT IN THE RELEASE STATE**
 
 *If you're interested in the project's roadmap, check out [**ROADMAP.md**](https://github.com/relativemodder/aegnux/blob/main/ROADMAP.md)*.
-
 
 
 [Download Flatpak package](https://github.com/relativemodder/com.relative.Aegnux/releases/latest) if you want to install it on any distro.
@@ -18,7 +14,7 @@ A convenient way to install Adobe After Effects on Linux using Wine. Heavily ins
 
 ## License disclaimer
 
-**ON MY WAY TO LICENSE THIS CODE UNDER GPL**
+**This project is licensed under GNU GENERAL PUBLIC LICENSE V3.**
 
 This project is intended for educational and experimental use only. Please respect software licensing agreements and use responsibly. The primary objective is to explore Linux compatibility for creative applications. After Effects is a commercial software developed by Adobe.
 
@@ -64,16 +60,3 @@ You can improve translations, AMD GPU support, overall stability, etc.
 - Your code should follow the style of our project
 - DON'T SEND AI-GENERATED SLOP, please, for the love of god
 - Try to follow the [**ROADMAP.md**](https://github.com/relativemodder/aegnux/blob/main/ROADMAP.md)
-
-## If you're doubt about origins of binary files...
-
-I'm already omw to cleanup the repo from binaries.
-
-- Wine (compiled and stripped) - official repo
-- msxml3.dll - MS Windows
-- Visual C++ Redist pack - [TechPowerUp](https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/)
-- kitty - [Binary releases](https://github.com/kovidgoyal/kitty/releases)
-- cabextract - [Binary RPM](https://src.fedoraproject.org/rpms/cabextract)
-- winetricks - it's already the source itself.
-
-IF YOU WANT TO CHANGE THIS, you're welcome to write additional pipeline to compile these files from scratch.

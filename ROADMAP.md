@@ -4,7 +4,7 @@
 
 - [ ] Plugins installation
 
-- [ ] Ged rid of binary blobs (except proprietary ones)
+- [x] Ged rid of binary blobs
 
 - [ ] Replace slow winetricks script
 
