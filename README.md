@@ -8,8 +8,9 @@ A convenient way to install Adobe After Effects on Linux using Wine. Heavily ins
 
 *If you're interested in the project's roadmap, check out [**ROADMAP.md**](https://github.com/relativemodder/aegnux/blob/main/ROADMAP.md)*.
 
-
 [Download Flatpak package](https://github.com/relativemodder/com.relative.Aegnux/releases/latest) if you want to install it on any distro.
+
+[<img src="assets/download_flatpak.png">](https://github.com/relativemodder/com.relative.Aegnux/releases/latest)
 
 
 ## License disclaimer
