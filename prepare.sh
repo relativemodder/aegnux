@@ -12,6 +12,7 @@ rm kitty-0.43.1-x86_64.txz
 echo Downloading Winetricks...
 curl -LO https://raw.githubusercontent.com/Winetricks/winetricks/refs/heads/master/src/winetricks
 mv winetricks ./bin/
+chmod +x ./bin/winetricks
 
 
 # Download cabextract
@@ -19,6 +20,7 @@ echo Downloading Cabextract...
 curl -LO https://www.cabextract.org.uk/cabextract-1.11-1.x86_64.rpm
 bsdtar -xf cabextract-1.11-1.x86_64.rpm usr/bin/cabextract
 mv usr/bin/cabextract ./bin/cabextract
+chmod +x ./bin/cabextract
 rm -rf usr
 rm cabextract-1.11-1.x86_64.rpm
 
