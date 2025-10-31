@@ -18,6 +18,8 @@ A convenient way to install Adobe After Effects on Linux using Wine. Heavily ins
 
 ## License disclaimer
 
+**ON MY WAY TO LICENSE THIS CODE UNDER GPL**
+
 This project is intended for educational and experimental use only. Please respect software licensing agreements and use responsibly. The primary objective is to explore Linux compatibility for creative applications. After Effects is a commercial software developed by Adobe.
 
 
@@ -27,19 +29,24 @@ This project is intended for educational and experimental use only. Please respe
 - UI Rendering - Occasional flickering with certain plugins (e.g., Flow)
 - Memory Management - Potential crashes under heavy RAM usage (need to tweak your system config)
 
-## How to install
+## How to install natively
 
 Native installation: the only tested environment is Arch Linux on KDE Plasma Wayland.
 
 ### Install dependencies
 ```bash
-sudo pacman -Syu pyside6 python-requests # Arch Linux
+sudo pacman -Syu pyside6 python-requests unzip libarchive curl tar # Arch Linux
 ```
 
 ### Clone the repository
 ```bash
 https://github.com/relativemodder/aegnux
 cd aegnux
+```
+
+### Download binaries for workarounds to work
+```bash
+./prepare.sh
 ```
 
 ### Run
@@ -59,6 +66,9 @@ You can improve translations, AMD GPU support, overall stability, etc.
 - Try to follow the [**ROADMAP.md**](https://github.com/relativemodder/aegnux/blob/main/ROADMAP.md)
 
 ## If you're doubt about origins of binary files...
+
+I'm already omw to cleanup the repo from binaries.
+
 - Wine (compiled and stripped) - official repo
 - msxml3.dll - MS Windows
 - Visual C++ Redist pack - [TechPowerUp](https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/)

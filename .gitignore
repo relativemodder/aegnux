@@ -6,3 +6,8 @@ builddir
 
 kitty-*-x86_64.txz
 cabextract-*.rpm
+
+bin/*
+!bin/.gitkeep
+
+assets/wine
