@@ -3,3 +3,6 @@
 **/__pycache__
 builddir
 .venv
+
+kitty-*-x86_64.txz
+cabextract-*.rpm
