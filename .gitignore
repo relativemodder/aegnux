@@ -11,3 +11,4 @@ bin/*
 !bin/.gitkeep
 
 assets/wine
+assets/vcr.zip
