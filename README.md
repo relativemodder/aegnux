@@ -30,15 +30,18 @@ This project is intended for educational and experimental use only. Please respe
 
 Native installation: the only tested environment is Arch Linux on KDE Plasma Wayland.
 
-### Install dependencies
-```bash
-sudo pacman -Syu pyside6 python-requests unzip libarchive curl tar # Arch Linux
-```
 **It's available in the [AUR](https://aur.archlinux.org/packages/aegnux) now**
 ```bash
 yay -S aegnux
 # ...or
 paru -S aegnux
+```
+
+## Manual installation
+
+### Install dependencies
+```bash
+sudo pacman -Syu pyside6 python-requests unzip libarchive curl tar # Arch Linux
 ```
 
 ### Clone the repository
