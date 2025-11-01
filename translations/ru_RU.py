@@ -15,5 +15,18 @@ STRINGS = {
     'wineprefix': 'Префикс Wine',
     'tip_alt_t': 'Совет: нажмите ALT+T, чтобы открыть терминал с окружением Wine и уже заданным префиксом.',
     'confirm_exit': 'Подтвердите выход',
-    'confirm_exit_text': 'Вы точно хотите выйти из Aegnux?'
+    'confirm_exit_text': 'Вы точно хотите выйти из Aegnux?',
+    'run_menu': 'Запустить',
+    'ae_action': 'After Effects',
+    'exe_action': 'Другой файл .EXE',
+    'reg_action': 'Импортировать файл реестра',
+    'browse_menu': 'Обзор',
+    'wpd_action': 'Префикс Wine',
+    'plugind_action': 'Папка с плагинами',
+    'aed_action': 'Папка с AE',
+    'aeg_action': 'Папка с установкой Aegnux',
+    'debug_menu': 'Отладка',
+    'kill_action': 'Остановить AE',
+    'log_action': 'Вкл/выкл логи',
+    'term_action': 'Открыть терминал'
 }
