@@ -15,5 +15,18 @@ STRINGS = {
     'wineprefix': 'Wine prefix',
     'tip_alt_t': 'Tip: press ALT+T to open up a terminal with Wine environment and prefix set.',
     'confirm_exit': 'Confirm exit',
-    'confirm_exit_text': 'Are you sure you want to quit Aegnux?'
+    'confirm_exit_text': 'Are you sure you want to quit Aegnux?',
+    'run_menu': 'Run',
+    'ae_action': 'After Effects',
+    'exe_action': 'Other .EXE file',
+    'reg_action': 'Import Registry file',
+    'browse_menu': 'Browse',
+    'wpd_action': 'Wine prefix',
+    'plugind_action': 'Plugins directory',
+    'aed_action': 'AE Directory',
+    'aeg_action': 'Aegnux installation directory',
+    'debug_menu': 'Debug',
+    'kill_action': 'Kill AE',
+    'log_action': 'Toggle log',
+    'term_action': 'Open Terminal'
 }

@@ -1,15 +1,10 @@
 from src.processthread import ProcessThread
 from src.utils import get_ae_install_dir
+from src.runexethread import RunExeThread
 
-class RunAEThread(ProcessThread):
+class RunAEThread(RunExeThread):
     def __init__(self):
-        super().__init__()
+        super().__init__(['AfterFX.exe'])
     
     def run(self):
-        self.run_command(
-            ['wine', 'AfterFX.exe'], 
-            cwd=get_ae_install_dir(),
-            in_prefix=True
-        )
-
-        self.finished_signal.emit(True)
+        super().run()
