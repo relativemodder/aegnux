@@ -1,6 +1,6 @@
 Windows Registry Editor Version 5.00
 
-[HKEY_CURRENT_USER\\Control Panel\\Desktop]
+[HKEY_CURRENT_USER\Control Panel\Desktop]
 "FontSmoothing"="2"
 "FontSmoothingGamma"=dword:00000578
 "FontSmoothingOrientation"=dword:00000001
