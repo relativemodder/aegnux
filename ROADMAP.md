@@ -14,7 +14,7 @@
 
 - [ ] Make .rpm package
 
-- [ ] Make AUR package
+- [x] Make AUR package
 
 - [ ] Improve stability
 

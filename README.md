@@ -34,6 +34,12 @@ Native installation: the only tested environment is Arch Linux on KDE Plasma Way
 ```bash
 sudo pacman -Syu pyside6 python-requests unzip libarchive curl tar # Arch Linux
 ```
+**It's available in the [AUR](https://aur.archlinux.org/packages/aegnux) now**
+```bash
+yay -S aegnux
+# ...or
+paru -S aegnux
+```
 
 ### Clone the repository
 ```bash
