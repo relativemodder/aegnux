@@ -35,7 +35,15 @@ rm wine-10.17-amd64-wow64.tar.xz
 # Download Visual C++ Redistributable Runtimes
 echo Downloading Visual C++ Redistributable Runtimes...
 curl -LO https://uk1-dl.techpowerup.com/files/qpMrHvhJCaISg-CxO9bnTg/1761969558/Visual-C-Runtimes-All-in-One-Jul-2025.zip
-mv Visual-C-Runtimes-All-in-One-Jul-2025.zip ./assets/vcr.zip
+VCR_FILE="Visual-C-Runtimes-All-in-One-Jul-2025.zip"
+
+if head -c 512 "$VCR_FILE" | grep -q -i -E "(<!DOCTYPE|<html>|<?xml)"; then
+    echo "Error: Downloaded file appears to be an HTML or XML page (possible error/redirect page)."
+    rm "$VCR_FILE"
+    exit 1
+fi
+
+mv "$VCR_FILE" ./assets/vcr.zip
 
 
 # Download msxml3.zip bundle
