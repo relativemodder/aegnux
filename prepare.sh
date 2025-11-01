@@ -40,8 +40,8 @@ mv ./vcr.zip ./assets/vcr.zip
 
 # Download msxml3.zip bundle
 echo Downloading msxml3 dlls...
-curl -LO https://github.com/cutefishaep/AeNux/raw/refs/heads/main/asset/System32/msxml3.dll
-curl -LO https://github.com/cutefishaep/AeNux/raw/refs/heads/main/asset/System32/msxml3r.dll
+curl -LO https://github.com/relativemodder/aegnux/releases/download/vcrbin/msxml3.dll
+curl -LO https://github.com/relativemodder/aegnux/releases/download/vcrbin/msxml3r.dll
 zip ./assets/msxml3.zip msxml3.dll msxml3r.dll
 rm msxml3.dll
 rm msxml3r.dll
