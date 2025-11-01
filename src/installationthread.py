@@ -5,7 +5,7 @@ from src.config import (
     AE_DOWNLOAD_URL, AE_FILENAME, 
     WINE_RUNNER_DIR, WINETRICKS_BIN, 
     CABEXTRACT_BIN, WINE_STYLE_REG,
-    VCR_ZIP, MSXML_ZIP
+    VCR_ZIP, MSXML_ZIP, GDIPLUS_DLL
 )
 from src.processthread import ProcessThread
 from src.utils import (
@@ -107,7 +107,7 @@ class InstallationThread(ProcessThread):
             
             self.progress_signal.emit(60)
 
-            tweaks = ['dxvk', 'corefonts', 'gdiplus', 'fontsmooth=rgb']
+            tweaks = ['dxvk', 'corefonts', 'fontsmooth=rgb']
             for tweak in tweaks:
                 self.log_signal.emit(f'[DEBUG] Installing {tweak} with winetricks')
                 self.run_command(['winetricks', '-q', tweak], in_prefix=True)
@@ -139,6 +139,16 @@ class InstallationThread(ProcessThread):
                 ['wine', 'reg', 'add', 
                  'HKCU\\Software\\Wine\\DllOverrides', '/v', 
                  'msxml3', '/d', 'native,builtin', '/f'], 
+                in_prefix=True
+            )
+
+            self.log_signal.emit(f'[DEBUG] Overriding gdiplus DLL...')
+            shutil.copy(GDIPLUS_DLL, system32_dir.joinpath('gdiplus.dll'))
+
+            self.run_command(
+                ['wine', 'reg', 'add', 
+                 'HKCU\\Software\\Wine\\DllOverrides', '/v', 
+                 'gdiplus', '/d', 'native,builtin', '/f'], 
                 in_prefix=True
             )
 

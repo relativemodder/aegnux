@@ -46,5 +46,11 @@ zip ./assets/msxml3.zip msxml3.dll msxml3r.dll
 rm msxml3.dll
 rm msxml3r.dll
 
+
+# Download gdiplus.dll
+echo Downloading gdiplus.dll...
+curl -LO https://github.com/relativemodder/aegnux/releases/download/vcrbin/gdiplus.dll
+mv gdiplus.dll ./assets/
+
 echo --------------------------------------------
 echo Done!
