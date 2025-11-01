@@ -12,6 +12,7 @@ WINE_RUNNER_DIR = BASE_DIR + '/assets/wine'
 WINETRICKS_BIN = BASE_DIR + '/bin/winetricks'
 CABEXTRACT_BIN = BASE_DIR + '/bin/cabextract'
 GDIPLUS_DLL = BASE_DIR + '/assets/gdiplus.dll'
+FONTSMOOTH_REG = BASE_DIR + '/assets/fontsmooth.reg'
 
 VCR_ZIP = BASE_DIR + '/assets/vcr.zip'
 MSXML_ZIP = BASE_DIR + '/assets/msxml3.zip'

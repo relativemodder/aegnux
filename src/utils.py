@@ -91,6 +91,15 @@ def get_wineprefix_dir():
 
     return wineprefix_dir
 
+def get_cep_dir():
+    wineprefix_dir = get_wineprefix_dir()
+    cep_dir = wineprefix_dir.joinpath('drive_c/Program Files (x86)/Common Files/Adobe/CEP')
+
+    if not os.path.exists(cep_dir):
+        os.makedirs(cep_dir)
+
+    return cep_dir
+
 def get_wine_runner_dir():
     aegnux_dir = get_aegnux_installation_dir()
     runner_dir = aegnux_dir.joinpath('runner')

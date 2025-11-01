@@ -28,5 +28,6 @@ STRINGS = {
     'debug_menu': 'Отладка',
     'kill_action': 'Остановить AE',
     'log_action': 'Вкл/выкл логи',
-    'term_action': 'Открыть терминал'
+    'term_action': 'Открыть терминал',
+    'cep_action': 'Папка с CEP'
 }

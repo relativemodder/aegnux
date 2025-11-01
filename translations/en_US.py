@@ -28,5 +28,6 @@ STRINGS = {
     'debug_menu': 'Debug',
     'kill_action': 'Kill AE',
     'log_action': 'Toggle log',
-    'term_action': 'Open Terminal'
+    'term_action': 'Open Terminal',
+    'cep_action': 'CEP directory'
 }

@@ -12,7 +12,7 @@ from src.killaethread import KillAEThread
 from src.removeaethread import RemoveAEThread
 from src.utils import (
     check_aegnux_tip_marked, get_wine_bin_path_env, 
-    show_download_method_dialog, get_ae_plugins_dir, get_wineprefix_dir, 
+    get_cep_dir, get_ae_plugins_dir, get_wineprefix_dir, 
     check_aegnux_installed, mark_aegnux_tip_as_shown, get_ae_install_dir, get_aegnux_installation_dir
 )
 from src.types import DownloadMethod
@@ -63,6 +63,7 @@ class MainWindow(MainWindowUI):
         self.plugind_action.triggered.connect(self.plugins_folder_clicked)
         self.aed_action.triggered.connect(self.ae_folder_clicked)
         self.aeg_action.triggered.connect(self.aegnux_folder_clicked)
+        self.cep_action.triggered.connect(self.cep_folder_clicked)
 
     def init_installation(self):
         if check_aegnux_installed():
@@ -96,6 +97,7 @@ class MainWindow(MainWindowUI):
         self.plugind_action = self.browseMenu.addAction(gls('plugind_action'))
         self.aed_action = self.browseMenu.addAction(gls('aed_action'))
         self.aeg_action = self.browseMenu.addAction(gls('aeg_action'))
+        self.cep_action = self.browseMenu.addAction(gls('cep_action'))
 
         self.debugMenu = self.menuBar().addMenu(gls('debug_menu'))
         self.kill_action = self.debugMenu.addAction(gls('kill_action'))
@@ -221,6 +223,10 @@ class MainWindow(MainWindowUI):
     @Slot()
     def aegnux_folder_clicked(self):
         os.system(f'xdg-open "{get_aegnux_installation_dir()}"')
+    
+    @Slot()
+    def cep_folder_clicked(self):
+        os.system(f'xdg-open "{get_cep_dir()}"')
     
     @Slot()
     def run_command_alt_t(self):

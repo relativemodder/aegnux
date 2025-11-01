@@ -6,7 +6,7 @@
 
 - [x] Ged rid of binary blobs
 
-- [ ] Replace slow winetricks script
+- [ ] Replace slow winetricks script (almost done)
 
 - [ ] Desktop integration (.aep file association)
 

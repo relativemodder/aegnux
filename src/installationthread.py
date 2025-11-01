@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import shutil
 from src.config import (
-    AE_DOWNLOAD_URL, AE_FILENAME, 
+    AE_DOWNLOAD_URL, AE_FILENAME, FONTSMOOTH_REG, 
     WINE_RUNNER_DIR, WINETRICKS_BIN, 
     CABEXTRACT_BIN, WINE_STYLE_REG,
     VCR_ZIP, MSXML_ZIP, GDIPLUS_DLL
@@ -12,7 +12,8 @@ from src.utils import (
     DownloadMethod, get_aegnux_installation_dir, 
     get_ae_install_dir, get_wine_runner_dir, is_nvidia_present,
     get_winetricks_bin, get_wineprefix_dir, get_cabextract_bin,
-    get_vcr_dir_path, get_msxml_dir_path, mark_aegnux_as_installed
+    get_vcr_dir_path, get_msxml_dir_path, mark_aegnux_as_installed,
+    get_cep_dir
 )
 
 class InstallationThread(ProcessThread):
@@ -107,7 +108,7 @@ class InstallationThread(ProcessThread):
             
             self.progress_signal.emit(60)
 
-            tweaks = ['dxvk', 'corefonts', 'fontsmooth=rgb']
+            tweaks = ['dxvk', 'corefonts']
             for tweak in tweaks:
                 self.log_signal.emit(f'[DEBUG] Installing {tweak} with winetricks')
                 self.run_command(['winetricks', '-q', tweak], in_prefix=True)
@@ -152,9 +153,20 @@ class InstallationThread(ProcessThread):
                 in_prefix=True
             )
 
+            self.log_signal.emit(f'[DEBUG] Applying fontsmooth settings')
+            self.run_command(
+                ['wine', 'regedit', FONTSMOOTH_REG], 
+                in_prefix=True
+            )
+
             if is_nvidia_present():
                 self.log_signal.emit("[INFO] Starting NVIDIA libs installation...")
                 self.install_nvidia_libs()
+            
+            try:
+                self.log_signal.emit(f"[INFO] Created CEP directory in {get_cep_dir()}")
+            except:
+                pass
             
             self.progress_signal.emit(99)
 

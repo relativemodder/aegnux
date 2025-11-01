@@ -14,7 +14,7 @@ class MainWindowUI(QMainWindow):
         super().__init__()
         self._construct_ui()
         self._set_styles()
-        self.setMinimumSize(480, 600)
+        self.setMinimumSize(500, 600)
     
     def _set_styles(self):
         with open(f'{STYLES_PATH}/mainwindow.css') as fp:
@@ -33,8 +33,21 @@ class MainWindowUI(QMainWindow):
     def _construct_ui(self):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
+
+        layout_container = QWidget()
+        layout_container.setMinimumWidth(500)
     
-        self.root_layout = QVBoxLayout(central_widget)
+        self.root_layout = QVBoxLayout(layout_container)
+
+        main_layout = QHBoxLayout(central_widget)
+
+        main_layout.addItem(
+            QSpacerItem(1, 1, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        )
+        main_layout.addWidget(layout_container)
+        main_layout.addItem(
+            QSpacerItem(1, 1, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        )
 
         self.add_expanding_vertical_sizer()
 
