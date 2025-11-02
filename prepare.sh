@@ -52,5 +52,11 @@ echo Downloading gdiplus.dll...
 curl -LO https://github.com/relativemodder/aegnux/releases/download/vcrbin/gdiplus.dll
 mv gdiplus.dll ./assets/
 
+
+# Download dxvk
+echo Downloading dxvk...
+curl -LO https://github.com/doitsujin/dxvk/releases/download/v2.7.1/dxvk-2.7.1.tar.gz
+mv dxvk-2.7.1.tar.gz ./assets/dxvk.tar.gz
+
 echo --------------------------------------------
 echo Done!

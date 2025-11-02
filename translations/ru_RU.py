@@ -29,5 +29,8 @@ STRINGS = {
     'kill_action': 'Остановить AE',
     'log_action': 'Вкл/выкл логи',
     'term_action': 'Открыть терминал',
-    'cep_action': 'Папка с CEP'
+    'cep_action': 'Папка с CEP',
+    'offline_note': 'Внимание, оффлайн',
+    'offline_note_text': 'Учтите, что .zip-архив должен содержать After Effects из Program Files (включая AfterFX.exe).',
+    'error': 'Ошибка'
 }

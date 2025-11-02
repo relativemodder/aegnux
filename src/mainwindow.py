@@ -122,6 +122,14 @@ class MainWindow(MainWindowUI):
         self.progress_bar.hide()
         self.init_installation()
 
+        if not success:
+            QMessageBox.critical(
+                self,
+                gls('error'),
+                self.logs_edit.toPlainText().split('\n')[-2]
+            )
+            return
+
         if check_aegnux_installed() and not check_aegnux_tip_marked():
             QMessageBox.information(self, '', gls('tip_alt_t'))
             mark_aegnux_tip_as_shown()
@@ -143,6 +151,12 @@ class MainWindow(MainWindowUI):
         self.install_thread.set_download_method(method)
 
         if method == DownloadMethod.OFFLINE:
+            QMessageBox.warning(
+                self,
+                gls('offline_note'),
+                gls('offline_note_text')
+            )
+
             filename, _ = QFileDialog.getOpenFileName(
                 self,
                 gls('offline_ae_zip_title'),

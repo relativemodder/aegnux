@@ -29,5 +29,8 @@ STRINGS = {
     'kill_action': 'Kill AE',
     'log_action': 'Toggle log',
     'term_action': 'Open Terminal',
-    'cep_action': 'CEP directory'
+    'cep_action': 'CEP directory',
+    'offline_note': 'Offline note',
+    'offline_note_text': 'Note that the .zip archive should contain After Effects from Program Files (including AfterFX.exe).',
+    'error': 'Error'
 }
