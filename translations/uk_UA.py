@@ -30,4 +30,7 @@ STRINGS = {
     "log_action": "Увімк/вимк логування",
     "term_action": "Відкрити термінал",
     "cep_action": "Папка з CEP",
+    'offline_note': 'Увага, офлайн',
+    'offline_note_text': 'Зауважте, що .zip-архів повинен містити After Effects з Program Files (включаючи AfterFX.exe).',
+    'error': 'Помилка'
 }
