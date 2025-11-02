@@ -35,11 +35,8 @@ class InstallationThread(ProcessThread):
 
     def run(self):
         try:
-            try:
-                shutil.rmtree(get_aegnux_installation_dir(), True)
-            except:
-                self.log_signal.emit(f'[WARNING] Can\'t remove existing installation.')
-
+            self.try_cleanup_installation()
+            
             self.progress_signal.emit(10)
 
             if self.download_method == DownloadMethod.ONLINE:
@@ -128,6 +125,12 @@ class InstallationThread(ProcessThread):
             traceback.print_exc()
             self.log_signal.emit(f'[ERROR] {e}')
             self.finished_signal.emit(False)
+    
+    def try_cleanup_installation(self):
+        try:
+            shutil.rmtree(get_aegnux_installation_dir(), True)
+        except:
+            self.log_signal.emit(f'[WARNING] Can\'t remove existing installation.')
     
     def install_vcr(self):
         self.log_signal.emit(f'[DEBUG] Unpacking VCR to {get_vcr_dir_path()}...')
