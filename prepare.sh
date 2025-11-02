@@ -1,12 +1,13 @@
 #!/bin/sh
 
-
-# Download Kitty Binary
-echo Downloading Kitty Binary...
-curl -LO https://github.com/kovidgoyal/kitty/releases/download/v0.43.1/kitty-0.43.1-x86_64.txz
-mkdir -p ./bin/kitty && tar Jxf kitty-0.43.1-x86_64.txz --strip-components=0 -C ./bin/kitty
-rm kitty-0.43.1-x86_64.txz
-
+# Yeah, bundling the entire terminal emulator for flatpak builds lol
+if [ -d /app ]; then
+    # Download Kitty Binary
+    echo Downloading Kitty Binary...
+    curl -LO https://github.com/kovidgoyal/kitty/releases/download/v0.43.1/kitty-0.43.1-x86_64.txz
+    mkdir -p ./bin/kitty && tar Jxf kitty-0.43.1-x86_64.txz --strip-components=0 -C ./bin/kitty
+    rm kitty-0.43.1-x86_64.txz
+fi
 
 # Download winetricks
 echo Downloading Winetricks...
