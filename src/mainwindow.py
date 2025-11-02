@@ -13,7 +13,8 @@ from src.removeaethread import RemoveAEThread
 from src.utils import (
     check_aegnux_tip_marked, get_wine_bin_path_env, 
     get_cep_dir, get_ae_plugins_dir, get_wineprefix_dir, 
-    check_aegnux_installed, mark_aegnux_tip_as_shown, get_ae_install_dir, get_aegnux_installation_dir
+    check_aegnux_installed, mark_aegnux_tip_as_shown, get_ae_install_dir, get_aegnux_installation_dir,
+    get_default_terminal
 )
 from src.types import DownloadMethod
 
