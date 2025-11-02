@@ -148,7 +148,52 @@ def get_wine_bin_path_env(old_path: str | None):
     old_path = old_path if old_path is not None else os.getenv('PATH')
     return f'{get_wine_runner_dir().as_posix()}/bin:{old_path}'
 
+def get_default_terminal() -> str:
+    DEFAULT_ENVS = ["TERMINAL", "TERM_PROGRAM"]
+    TERMINALS = [
+        "konsole",
+        "kitty",
+        "alacritty",
+        "gnome-terminal",
+        "xfce4-terminal",
+        "terminator",
+        "lxterminal",
+        "tilix",
+        "st",
+        "mate-terminal",
+        "xterm",
+        "urxvt",
+        "deepin-terminal",
+        "sakura",
+        "tilda",
+        "guake",
+        "hyper",
+        "eterm",
+        "rxvt",
+        "lxterm",
+        "cosmic-terminal",
+    ]
 
+    candidates = (
+        shutil.which(os.environ.get(var)) for var in DEFAULT_ENVS if os.environ.get(var)
+    )
+
+    # Debian/Ubuntu
+    alt = "/etc/alternatives/x-terminal-emulator"
+    if os.path.exists(alt):
+        candidates = (shutil.which(os.readlink(alt)), *candidates)
+
+    # Popular terminals
+    candidates = (*candidates, *(shutil.which(term) for term in TERMINALS))
+
+    terminal = next((t for t in candidates if t), None)
+    if terminal:
+        return terminal
+
+    raise RuntimeError(
+        "Your terminal was not found or is not supported.\n"
+        "Install one of the following: " + ", ".join(TERMINALS)
+    )
 
 def get_aegnux_tip_marked_flag_path():
     hades = get_aegnux_installation_dir()
