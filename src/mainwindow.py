@@ -234,10 +234,11 @@ class MainWindow(MainWindowUI):
         env['WINEPREFIX'] = get_wineprefix_dir()
         env['PATH'] = get_wine_bin_path_env('/usr/bin')
 
-        process = subprocess.Popen(
-            ['./bin/kitty/bin/kitty', 'bash'],
-            env=env
-        )
+        try:
+            terminal = get_default_terminal()
+            subprocess.Popen([terminal, "bash"], env=env)
+        except RuntimeError as e:
+            print("[CRITICAL ERROR]:", e)
     
     @Slot()
     def run_command_ctrl_q(self):

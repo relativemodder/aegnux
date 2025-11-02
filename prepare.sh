@@ -1,13 +1,5 @@
 #!/bin/sh
 
-
-# Download Kitty Binary
-echo Downloading Kitty Binary...
-curl -LO https://github.com/kovidgoyal/kitty/releases/download/v0.43.1/kitty-0.43.1-x86_64.txz
-mkdir -p ./bin/kitty && tar Jxf kitty-0.43.1-x86_64.txz --strip-components=0 -C ./bin/kitty
-rm kitty-0.43.1-x86_64.txz
-
-
 # Download winetricks
 echo Downloading Winetricks...
 curl -LO https://raw.githubusercontent.com/Winetricks/winetricks/refs/heads/master/src/winetricks

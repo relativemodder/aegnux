@@ -6,6 +6,53 @@ from src.types import DownloadMethod
 from PySide6.QtWidgets import QMessageBox
 from pathlib import Path
 
+def get_default_terminal() -> str:
+    DEFAULT_ENVS = ["TERMINAL", "TERM_PROGRAM"]
+    TERMINALS = [
+        "konsole",
+        "kitty",
+        "alacritty",
+        "gnome-terminal",
+        "xfce4-terminal",
+        "terminator",
+        "lxterminal",
+        "tilix",
+        "st",
+        "mate-terminal",
+        "xterm",
+        "urxvt",
+        "deepin-terminal",
+        "sakura",
+        "tilda",
+        "guake",
+        "hyper",
+        "eterm",
+        "rxvt",
+        "lxterm",
+        "cosmic-terminal",
+    ]
+
+    candidates = (
+        shutil.which(os.environ.get(var)) for var in DEFAULT_ENVS if os.environ.get(var)
+    )
+
+    # Debian/Ubuntu
+    alt = "/etc/alternatives/x-terminal-emulator"
+    if os.path.exists(alt):
+        candidates = (shutil.which(os.readlink(alt)), *candidates)
+
+    # Popular terminals
+    candidates = (*candidates, *(shutil.which(term) for term in TERMINALS))
+
+    terminal = next((t for t in candidates if t), None)
+    if terminal:
+        return terminal
+
+    raise RuntimeError(
+        "Your terminal was not found or is not supported.\n"
+        "Install one of the following: " + ", ".join(TERMINALS)
+    )
+
 def format_size(size_bytes):
     if size_bytes == 0:
         return "0 B"
