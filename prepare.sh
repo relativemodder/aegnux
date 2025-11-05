@@ -28,9 +28,9 @@ rm cabextract-1.11-1.x86_64.rpm
 
 # Download Wine
 echo Downloading Wine...
-curl -LO https://github.com/Kron4ek/Wine-Builds/releases/download/10.17/wine-10.17-amd64-wow64.tar.xz
-mkdir -p ./assets/wine && tar Jxf wine-10.17-amd64-wow64.tar.xz --strip-components=1 -C ./assets/wine
-rm wine-10.17-amd64-wow64.tar.xz
+curl -LO https://github.com/Kron4ek/Wine-Builds/releases/download/10.18/wine-10.18-staging-tkg-amd64-wow64.tar.xz
+mkdir -p ./assets/wine && tar Jxf wine-10.18-staging-tkg-amd64-wow64.tar.xz --strip-components=1 -C ./assets/wine
+rm wine-10.18-staging-tkg-amd64-wow64.tar.xz
 
 
 # Download Visual C++ Redistributable Runtimes
