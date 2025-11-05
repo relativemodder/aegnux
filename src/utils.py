@@ -205,3 +205,13 @@ def check_aegnux_tip_marked():
 def mark_aegnux_tip_as_shown():
     with open(get_aegnux_tip_marked_flag_path(), 'w') as f:
         f.write('Press ALT+T to open up a terminal')
+
+
+def get_private_plugins_unpack_path():
+    aegnux_dir = get_aegnux_installation_dir()
+    ppu_dir = aegnux_dir.joinpath('private-plugins')
+
+    if not os.path.exists(ppu_dir):
+        os.makedirs(ppu_dir)
+
+    return ppu_dir

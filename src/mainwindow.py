@@ -9,6 +9,7 @@ from src.installationthread import InstallationThread
 from src.runaethread import RunAEThread
 from src.runexethread import RunExeThread
 from src.killaethread import KillAEThread
+from src.pluginthread import PluginThread
 from src.removeaethread import RemoveAEThread
 from src.utils import (
     check_aegnux_tip_marked, get_default_terminal, get_wine_bin_path_env, 
@@ -40,6 +41,11 @@ class MainWindow(MainWindowUI):
         self.remove_ae_thread = RemoveAEThread()
         self.remove_ae_thread.finished_signal.connect(self._finished)
 
+        self.plugin_thread = PluginThread()
+        self.plugin_thread.log_signal.connect(self._log)
+        self.plugin_thread.progress_signal.connect(self.progress_bar.setValue)
+        self.plugin_thread.finished_signal.connect(self._finished)
+
         self.alt_t_action = QAction(self)
         self.alt_t_action.setShortcut(QKeySequence("Alt+T"))
         self.alt_t_action.triggered.connect(self.run_command_alt_t)
@@ -56,6 +62,7 @@ class MainWindow(MainWindowUI):
         self.ae_action.triggered.connect(self.run_ae_button_clicked)
         self.exe_action.triggered.connect(self.run_exe_button_clicked)
         self.reg_action.triggered.connect(self.reg_button_clicked)
+        self.plugininst_action.triggered.connect(self.install_plugins_button_clicked)
         self.kill_action.triggered.connect(self.kill_ae_button_clicked)
         self.log_action.triggered.connect(self.toggle_logs)
         self.term_action.triggered.connect(self.run_command_alt_t)
@@ -74,6 +81,7 @@ class MainWindow(MainWindowUI):
             self.runMenu.setEnabled(True)
             self.browseMenu.setEnabled(True)
             self.kill_action.setEnabled(True)
+            self.plugininst_action.setEnabled(True)
             self.term_action.setEnabled(True)
 
         else:
@@ -85,11 +93,13 @@ class MainWindow(MainWindowUI):
             self.browseMenu.setEnabled(False)
             self.kill_action.setEnabled(False)
             self.term_action.setEnabled(False)
+            self.plugininst_action.setEnabled(False)
     
     def _construct_menubar(self):
         self.runMenu = self.menuBar().addMenu(gls('run_menu'))
         self.ae_action = self.runMenu.addAction(gls('ae_action'))
         self.exe_action = self.runMenu.addAction(gls('exe_action'))
+        self.plugininst_action = self.runMenu.addAction(gls('plugininst_action'))
         self.reg_action = self.runMenu.addAction(gls('reg_action'))
 
         self.browseMenu = self.menuBar().addMenu(gls('browse_menu'))
@@ -108,6 +118,8 @@ class MainWindow(MainWindowUI):
         self.install_button.setEnabled(not lock)
         self.run_button.setEnabled(not lock)
         self.remove_aegnux_button.setEnabled(not lock)
+
+        self.runMenu.setEnabled(not lock)
     
     @Slot()
     def toggle_logs(self):
@@ -171,6 +183,29 @@ class MainWindow(MainWindowUI):
         self.lock_ui()
         self.progress_bar.show()
         self.install_thread.start()
+    
+    @Slot()
+    def install_plugins_button_clicked(self):
+        QMessageBox.information(
+            self,
+            gls('plugin_note'),
+            gls('plugin_note_text')
+        )
+
+        filename, _ = QFileDialog.getOpenFileName(
+            self,
+            gls('offline_ae_zip_title'),
+            "",
+            "Zip Files (*.zip);;All Files (*)"
+        )
+        if filename == '':
+            return
+        
+        self.plugin_thread.set_plugin_zip_filename(filename)
+        
+        self.lock_ui()
+        self.progress_bar.show()
+        self.plugin_thread.start()
     
     @Slot()
     def run_ae_button_clicked(self):

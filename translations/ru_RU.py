@@ -32,5 +32,10 @@ STRINGS = {
     'cep_action': 'Папка с CEP',
     'offline_note': 'Внимание, оффлайн',
     'offline_note_text': 'Учтите, что .zip-архив должен содержать After Effects из Program Files (включая AfterFX.exe).',
-    'error': 'Ошибка'
+    'error': 'Ошибка',
+    'plugininst_action': 'Установить приватные плагины из ZIP',
+    'plugin_note': 'Замечание к приватным плагинам',
+    'plugin_note_text': 'Эти плагины доступны здесь: https://t.me/Aegnux',
+    'done_ae': 'AE был установлен.',
+    'done_plugins': 'Плагины были установлены.'
 }

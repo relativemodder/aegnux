@@ -32,5 +32,11 @@ STRINGS = {
     'cep_action': 'CEP directory',
     'offline_note': 'Offline note',
     'offline_note_text': 'Note that the .zip archive should contain After Effects from Program Files (including AfterFX.exe).',
-    'error': 'Error'
+    'error': 'Error',
+    'plugininst_action': 'Install private plugins from ZIP',
+    'plugin_note': 'Private plugins note',
+    'plugin_note_text': 'Those plugins are available at https://t.me/Aegnux',
+    'done_title': 'Done!',
+    'done_ae': 'AE has been installed.',
+    'done_plugins': 'The plugins have been installed.'
 }
