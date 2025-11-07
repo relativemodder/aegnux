@@ -2,7 +2,7 @@
 
 - [ ] Get hardware acceleration working on AMD GPUs
 
-- [ ] Plugins installation
+- [x] Plugins installation
 
 - [x] Ged rid of binary blobs
 
