@@ -2,4 +2,4 @@
 
 cd "$(dirname "$0")"
 
-python main.py
+python main.py "$@"

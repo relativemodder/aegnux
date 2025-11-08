@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 from ui.mainwindow import MainWindowUI
 from translations import gls
 from PySide6.QtCore import Slot
@@ -22,6 +23,8 @@ from src.types import DownloadMethod
 class MainWindow(MainWindowUI):
     def __init__(self):
         super().__init__()
+
+        self.ran_from_aep_file = False
 
         self.setWindowTitle(gls('welcome_win_title'))
         self.install_button.clicked.connect(self.install_button_clicked)
@@ -71,6 +74,26 @@ class MainWindow(MainWindowUI):
         self.aed_action.triggered.connect(self.ae_folder_clicked)
         self.aeg_action.triggered.connect(self.aegnux_folder_clicked)
         self.cep_action.triggered.connect(self.cep_folder_clicked)
+    
+    def try_autoopen_aep(self):
+        self.run_ae_thread.clear_aep_file_arg()
+        if self.ran_from_aep_file:
+            return
+        
+        self.ran_from_aep_file = True
+        
+        aep_file = ''
+
+        for arg in sys.argv:
+            if '.aep' in arg:
+                aep_file = arg
+                break
+        
+        if aep_file == '':
+            return
+        
+        self.run_ae_thread.add_aep_file_arg(aep_file)
+        self.run_ae_button_clicked()
 
     def init_installation(self):
         if check_aegnux_installed():
@@ -83,6 +106,7 @@ class MainWindow(MainWindowUI):
             self.kill_action.setEnabled(True)
             self.plugininst_action.setEnabled(True)
             self.term_action.setEnabled(True)
+            self.try_autoopen_aep()
 
         else:
             self.install_button.show()
