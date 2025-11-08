@@ -8,7 +8,9 @@
 
 - [ ] Replace slow winetricks script (almost done)
 
-- [ ] Desktop integration (.aep file association)
+- [x] Desktop integration (.aep file association)
+
+- [ ] Link opening support (e.g. Mister Horse or CC Login)
 
 - [ ] Make .deb package
 
