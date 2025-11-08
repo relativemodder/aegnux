@@ -6,13 +6,9 @@ A convenient way to install Adobe After Effects on Linux using Wine. Heavily ins
 
 **⚠️ SOFTWARE IS NOT IN THE RELEASE STATE**
 
-*If you're interested in the project's roadmap, check out [**ROADMAP.md**](https://github.com/relativemodder/aegnux/blob/main/ROADMAP.md)*.
-
-[Download Flatpak package](https://github.com/relativemodder/com.relative.Aegnux/releases/latest) if you want to install it on any distro.
-
-[<img src="assets/download_flatpak.png">](https://github.com/relativemodder/com.relative.Aegnux/releases/latest)
-
 <div align="center">
+
+### Aegnux community
 
 [![Reddit Badge](https://img.shields.io/badge/reddit-orange?style=flat&logoColor=%23ff4500&label=Aegnux%20Sub&link=https%3A%2F%2Fwww.reddit.com%2Fr%2FAegnux)](https://www.reddit.com/r/Aegnux/)
 [![AUR Badge](https://img.shields.io/badge/aur-package-blue?style=flat&label=AUR&link=https%3A%2F%2Faur.archlinux.org%2Fpackages%2Faegnux)](https://aur.archlinux.org/packages/aegnux)
@@ -20,6 +16,12 @@ A convenient way to install Adobe After Effects on Linux using Wine. Heavily ins
 
 
 </div>
+
+*If you're interested in the project's roadmap, check out [**ROADMAP.md**](https://github.com/relativemodder/aegnux/blob/main/ROADMAP.md)*.
+
+[Download Flatpak package](https://github.com/relativemodder/com.relative.Aegnux/releases/latest) if you want to install it on any distro.
+
+[<img src="assets/download_flatpak.png">](https://github.com/relativemodder/com.relative.Aegnux/releases/latest)
 
 
 ## License disclaimer
