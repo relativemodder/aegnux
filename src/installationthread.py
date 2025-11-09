@@ -111,6 +111,8 @@ class InstallationThread(ProcessThread):
                 self.log_signal.emit(f"[INFO] Created CEP directory in {get_cep_dir()}")
             except:
                 pass
+
+            self.symlink_support_files()
             
             self.progress_signal.emit(99)
 
@@ -125,6 +127,19 @@ class InstallationThread(ProcessThread):
             traceback.print_exc()
             self.log_signal.emit(f'[ERROR] {e}')
             self.finished_signal.emit(False)
+    
+    def symlink_support_files(self):
+        ae_dir = get_ae_install_dir()
+        ae_pf_dir = get_wineprefix_dir().joinpath('drive_c/Program Files/Adobe/Adobe After Effects 2024')
+        support_files_dir = ae_pf_dir.joinpath('Support Files')
+
+        if not ae_pf_dir.exists():
+            os.makedirs(ae_pf_dir)
+        
+        if not support_files_dir.exists():
+            os.symlink(ae_dir, support_files_dir)
+        
+        self.log_signal.emit(f'[DEBUG] Created symlink from {ae_dir} to {support_files_dir}')
     
     def try_cleanup_installation(self):
         try:
