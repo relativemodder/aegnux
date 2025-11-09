@@ -21,11 +21,12 @@ from src.types import DownloadMethod
 
 
 class MainWindow(MainWindowUI):
-    def __init__(self):
+    def __init__(self, quit_after_handling_args: bool = False):
         super().__init__()
 
         self.ran_from_aep_file = False
         self.ran_from_mhtb_link = False
+        self.quit_after_handling_args = quit_after_handling_args
 
         self.setWindowTitle(gls('welcome_win_title'))
         self.install_button.clicked.connect(self.install_button_clicked)
@@ -99,7 +100,7 @@ class MainWindow(MainWindowUI):
                 gls('mhtb_not_found_title'),
                 gls('mhtb_not_found_text')
             )
-            return
+            exit(0)
         
         self.run_mhtb_thread = RunExeThread([f'{mhtb_dir.as_posix()}/ProductManager.exe', mhtb_link])
         self.run_mhtb_thread.log_signal.connect(self._log)
@@ -187,10 +188,7 @@ class MainWindow(MainWindowUI):
     
     @Slot(bool)
     def _finished(self, success: bool):
-        if self.ran_from_mhtb_link:
-            exit(0)
-        
-        if self.ran_from_aep_file:
+        if self.quit_after_handling_args:
             exit(0)
         
         self.lock_ui(False)
