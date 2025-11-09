@@ -106,7 +106,6 @@ class MainWindow(MainWindowUI):
         self.run_mhtb_thread.finished_signal.connect(self._finished)
 
         self.run_mhtb_thread.start()
-        exit(0)
     
     def try_autoopen_aep(self):
         self.run_ae_thread.clear_aep_file_arg()
@@ -127,7 +126,6 @@ class MainWindow(MainWindowUI):
         
         self.run_ae_thread.add_aep_file_arg(aep_file)
         self.run_ae_button_clicked()
-        exit(0)
 
     def init_installation(self):
         if check_aegnux_installed():
@@ -189,6 +187,12 @@ class MainWindow(MainWindowUI):
     
     @Slot(bool)
     def _finished(self, success: bool):
+        if self.ran_from_mhtb_link:
+            exit(0)
+        
+        if self.ran_from_aep_file:
+            exit(0)
+        
         self.lock_ui(False)
         self.progress_bar.hide()
         self.init_installation()

@@ -12,6 +12,15 @@ def main():
     app.setWindowIcon(QIcon(AE_ICON_PATH))
 
     mainWindow = MainWindow()
-    mainWindow.show()
+
+    show_window = True
+
+    for arg in sys.argv:
+        if 'misterhorsepm://' in arg or '.aep' in arg:
+            show_window = False
+            break
+    
+    if show_window:
+        mainWindow.show()
 
     return app.exec()
