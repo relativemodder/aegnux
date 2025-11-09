@@ -148,6 +148,15 @@ def get_wine_bin_path_env(old_path: str | None):
     old_path = old_path if old_path is not None else os.getenv('PATH')
     return f'{get_wine_runner_dir().as_posix()}/bin:{old_path}'
 
+def get_mhtb_install_dir():
+    wineprefix_dir = get_wineprefix_dir()
+    mhtb_dir = wineprefix_dir.joinpath('drive_c/Program Files/Mister Horse Product Manager')
+    
+    if not os.path.exists(mhtb_dir):
+        return None
+
+    return mhtb_dir
+
 def get_default_terminal() -> str:
     DEFAULT_ENVS = ["TERMINAL", "TERM_PROGRAM"]
     TERMINALS = [

@@ -13,7 +13,7 @@ from src.killaethread import KillAEThread
 from src.pluginthread import PluginThread
 from src.removeaethread import RemoveAEThread
 from src.utils import (
-    check_aegnux_tip_marked, get_default_terminal, get_wine_bin_path_env, 
+    check_aegnux_tip_marked, get_default_terminal, get_mhtb_install_dir, get_wine_bin_path_env, 
     get_cep_dir, get_ae_plugins_dir, get_wineprefix_dir, 
     check_aegnux_installed, mark_aegnux_tip_as_shown, get_ae_install_dir, get_aegnux_installation_dir
 )
@@ -25,6 +25,7 @@ class MainWindow(MainWindowUI):
         super().__init__()
 
         self.ran_from_aep_file = False
+        self.ran_from_mhtb_link = False
 
         self.setWindowTitle(gls('welcome_win_title'))
         self.install_button.clicked.connect(self.install_button_clicked)
@@ -75,6 +76,38 @@ class MainWindow(MainWindowUI):
         self.aeg_action.triggered.connect(self.aegnux_folder_clicked)
         self.cep_action.triggered.connect(self.cep_folder_clicked)
     
+    def try_autoopen_mhtb(self):
+        if self.ran_from_mhtb_link:
+            return
+        
+        self.ran_from_mhtb_link = True
+        
+        mhtb_link = ''
+
+        for arg in sys.argv:
+            if 'misterhorsepm://' in arg:
+                mhtb_link = arg
+                break
+        
+        if mhtb_link == '':
+            return
+        
+        mhtb_dir = get_mhtb_install_dir()
+        if mhtb_dir is None:
+            QMessageBox.warning(
+                self,
+                gls('mhtb_not_found_title'),
+                gls('mhtb_not_found_text')
+            )
+            return
+        
+        self.run_mhtb_thread = RunExeThread([f'{mhtb_dir.as_posix()}/ProductManager.exe', mhtb_link])
+        self.run_mhtb_thread.log_signal.connect(self._log)
+        self.run_mhtb_thread.finished_signal.connect(self._finished)
+
+        self.run_mhtb_thread.start()
+        exit(0)
+    
     def try_autoopen_aep(self):
         self.run_ae_thread.clear_aep_file_arg()
         if self.ran_from_aep_file:
@@ -94,6 +127,7 @@ class MainWindow(MainWindowUI):
         
         self.run_ae_thread.add_aep_file_arg(aep_file)
         self.run_ae_button_clicked()
+        exit(0)
 
     def init_installation(self):
         if check_aegnux_installed():
@@ -107,6 +141,7 @@ class MainWindow(MainWindowUI):
             self.plugininst_action.setEnabled(True)
             self.term_action.setEnabled(True)
             self.try_autoopen_aep()
+            self.try_autoopen_mhtb()
 
         else:
             self.install_button.show()

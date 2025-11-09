@@ -38,5 +38,7 @@ STRINGS = {
     'plugin_note_text': 'Those plugins are available at https://t.me/Aegnux',
     'done_title': 'Done!',
     'done_ae': 'AE has been installed.',
-    'done_plugins': 'The plugins have been installed.'
+    'done_plugins': 'The plugins have been installed.',
+    'mhtb_not_found_title': 'Mister Horse Product Manager Not Found',
+    'mhtb_not_found_text': 'Mister Horse Product Manager is not installed in the Wine prefix. Please install it first.'
 }

@@ -37,5 +37,7 @@ STRINGS = {
     'plugin_note': 'Замечание к приватным плагинам',
     'plugin_note_text': 'Эти плагины доступны здесь: https://t.me/Aegnux',
     'done_ae': 'AE был установлен.',
-    'done_plugins': 'Плагины были установлены.'
+    'done_plugins': 'Плагины были установлены.',
+    'mhtb_not_found_title': 'Mister Horse Product Manager не найден',
+    'mhtb_not_found_text': 'Mister Horse Product Manager не установлен в префиксе Wine. Пожалуйста, сначала установите его.'
 }
