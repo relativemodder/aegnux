@@ -33,11 +33,11 @@ mkdir -p ./assets/wine && tar Jxf wine-11.12-staging-tkg-amd64-wow64.tar.xz --st
 rm wine-11.12-staging-tkg-amd64-wow64.tar.xz
 
 # Download comdlg32 patches
-echo Downloading & applying file dialog patches...
+echo Downloading and applying file dialog patches...
 curl -LO https://github.com/buwryme/wine-xdg/releases/download/binaries/comdlg32.dll
 curl -LO https://github.com/buwryme/wine-xdg/releases/download/binaries/comdlg32.so
-mv comdlg32.so assets/wine/lib/x86_64-unix/comdlg32.so
-mv comdlg32.dll assets/wine/lib/x86_64-windows/comdlg32.dll
+mv comdlg32.so assets/wine/lib/wine/x86_64-unix/comdlg32.so
+mv comdlg32.dll assets/wine/lib/wine/x86_64-windows/comdlg32.dll
 
 # Download Visual C++ Redistributable Runtimes
 echo Downloading Visual C++ Redistributable Runtimes...
@@ -62,7 +62,7 @@ mv gdiplus.dll ./assets/
 
 # Download dxvk
 echo Downloading dxvk...
-curl -LO https://github.com/doitsujin/dxvk/releases/download/v2.7.1/dxvk-3.0.1.tar.gz
+curl -LO https://github.com/doitsujin/dxvk/releases/download/v3.0.1/dxvk-3.0.1.tar.gz
 mv dxvk-3.0.1.tar.gz ./assets/dxvk.tar.gz
 
 echo --------------------------------------------
