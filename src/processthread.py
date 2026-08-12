@@ -135,7 +135,7 @@ class ProcessThread(QThread):
             fl = fcntl.fcntl(fd, fcntl.F_GETFL)
             fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
-    def run_command(self, command: list, cwd: str = None, in_prefix: bool = False):
+    def run_command(self, command: list, cwd: str = None, in_prefix: bool = False, use_portal: bool = False):
         self.log_signal.emit(f'[COMMAND] Running command: {" ".join(command)}')
         self._is_cancelled = False
 
@@ -143,6 +143,8 @@ class ProcessThread(QThread):
         if in_prefix:
             env['WINEPREFIX'] = get_wineprefix_dir()
             env['PATH'] = get_wine_bin_path_env(env.get('PATH', os.defpath))
+        if use_portal:
+            env['WINE_USE_PORTAL'] = '1'
         
         try:
             process = subprocess.Popen(

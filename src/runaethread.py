@@ -4,7 +4,7 @@ from src.runexethread import RunExeThread
 
 class RunAEThread(RunExeThread):
     def __init__(self):
-        super().__init__(['AfterFX.exe'])
+        super().__init__(['AfterFX.exe'], use_portal=True)
     
     def add_aep_file_arg(self, aep_file: str):
         self.exe_args.append('Z:' + aep_file)
