@@ -12,18 +12,24 @@ class PluginThread(ProcessThread):
         self.plugin_zip_filename = filename
     
     def run(self):
-        self.log_signal.emit('[DEBUG] Unpacking plugins from the archive...')
-        self.progress_signal.emit(5)
-        self.remove_ppu_dir()
+        try:
+            self.log_signal.emit('[DEBUG] Unpacking plugins from the archive...')
+            self.progress_signal.emit(5)
+            self.remove_ppu_dir()
 
-        ppu_dir = get_private_plugins_unpack_path()
-        self.unpack_zip(self.plugin_zip_filename, ppu_dir.as_posix())
-        self.progress_signal.emit(15)
+            ppu_dir = get_private_plugins_unpack_path()
+            self.unpack_zip(self.plugin_zip_filename, ppu_dir.as_posix())
+            self.progress_signal.emit(15)
 
-        self.install_aex_plugins()
-        self.install_cep_extensions()
-        self.install_presets()
-        self.run_installers()
+            self.install_aex_plugins()
+            self.install_cep_extensions()
+            self.install_presets()
+            self.run_installers()
+        except Exception as e:
+            self.remove_ppu_dir()
+            self.log_signal.emit(f'[ERROR] {e}')
+            self.finished_signal.emit(False)
+            return
 
         self.remove_ppu_dir()
         self.progress_signal.emit(95)

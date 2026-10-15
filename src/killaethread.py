@@ -5,9 +5,12 @@ class KillAEThread(ProcessThread):
         super().__init__()
     
     def run(self):
-        self.run_command(
-            ['wineserver', '-k'], 
-            in_prefix=True
-        )
+        try:
+            self.run_command(
+                ['wineserver', '-k'],
+                in_prefix=True
+            )
+        except Exception as e:
+            self.log_signal.emit(f'[ERROR] {e}')
 
         self.finished_signal.emit(True)

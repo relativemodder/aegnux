@@ -146,18 +146,15 @@ class ProcessThread(QThread):
         if use_portal:
             env['WINE_USE_PORTAL'] = '1'
         
-        try:
-            process = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                cwd=cwd,
-                env=env
-            )
-        except FileNotFoundError:
-            self.log_signal.emit(f'[ERROR] Command not found: {command[0]}')
-            self.finished_signal.emit(False)
-            return
+        # Start failures (missing binary or cwd, not executable, wrong architecture) raise
+        # OSError to the thread's run(), which reports them and releases the UI.
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=cwd,
+            env=env
+        )
 
         self._set_non_blocking(process.stdout)
         self._set_non_blocking(process.stderr)
