@@ -3,8 +3,8 @@ import subprocess
 import sys
 from ui.mainwindow import MainWindowUI
 from translations import gls
-from PySide6.QtCore import Slot, QThread
-from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtCore import Slot, QThread, QUrl
+from PySide6.QtGui import QAction, QDesktopServices, QKeySequence
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 from src.installationthread import InstallationThread
 from src.runaethread import RunAEThread
@@ -18,6 +18,12 @@ from src.utils import (
     check_aegnux_installed, mark_aegnux_tip_as_shown, get_ae_install_dir, get_aegnux_installation_dir
 )
 from src.types import DownloadMethod
+
+
+def open_folder(path):
+    # Qt passes the path to xdg-open without a shell, so quotes or '$' in the path cannot
+    # break the command, and the GUI thread doesn't block while the file manager starts.
+    QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
 
 
 class MainWindow(MainWindowUI):
@@ -204,10 +210,11 @@ class MainWindow(MainWindowUI):
         self.init_installation()
 
         if not success:
+            log_lines = [line for line in self.logs_edit.toPlainText().split('\n') if line.strip()]
             QMessageBox.critical(
                 self,
                 gls('error'),
-                self.logs_edit.toPlainText().split('\n')[-2]
+                log_lines[-1] if log_lines else ''
             )
             return
 
@@ -328,23 +335,23 @@ class MainWindow(MainWindowUI):
     
     @Slot()
     def plugins_folder_clicked(self):
-        os.system(f'xdg-open "{get_ae_plugins_dir()}"')
+        open_folder(get_ae_plugins_dir())
     
     @Slot()
     def wineprefix_folder_clicked(self):
-        os.system(f'xdg-open "{get_wineprefix_dir()}"')
+        open_folder(get_wineprefix_dir())
     
     @Slot()
     def ae_folder_clicked(self):
-        os.system(f'xdg-open "{get_ae_install_dir()}"')
+        open_folder(get_ae_install_dir())
     
     @Slot()
     def aegnux_folder_clicked(self):
-        os.system(f'xdg-open "{get_aegnux_installation_dir()}"')
+        open_folder(get_aegnux_installation_dir())
     
     @Slot()
     def cep_folder_clicked(self):
-        os.system(f'xdg-open "{get_cep_dir()}"')
+        open_folder(get_cep_dir())
     
     @Slot()
     def run_command_alt_t(self):
@@ -355,7 +362,7 @@ class MainWindow(MainWindowUI):
         try:
             terminal = get_default_terminal()
             subprocess.Popen([terminal, "bash"], env=env)
-        except RuntimeError as e:
+        except (RuntimeError, OSError) as e:
             print("[CRITICAL ERROR]:", e)
     
     @Slot()
