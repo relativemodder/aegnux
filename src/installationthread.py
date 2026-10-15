@@ -211,7 +211,7 @@ class InstallationThread(ProcessThread):
 
         for source in [source_x64, source_x32]:
             for item in source.iterdir():
-                system_dir = system32_dir if 'x64' in source.as_posix() else syswow64_dir
+                system_dir = system32_dir if source.name == 'x64' else syswow64_dir
 
                 if item.is_file():
                     shutil.copy2(item, system_dir.joinpath(item.name))
