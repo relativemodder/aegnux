@@ -118,6 +118,7 @@ class PluginThread(ProcessThread):
         install_src = ppu_dir.joinpath('installer')
 
         video_copilot_dir = get_ae_plugins_dir().joinpath("VideoCopilot")
+        os.makedirs(video_copilot_dir, exist_ok=True)
         element_files = [
             ("Element.aex", "Element.aex"),
             ("Element.license", "Element.license")
