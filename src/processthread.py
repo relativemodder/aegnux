@@ -25,7 +25,8 @@ class ProcessThread(QThread):
         self._is_cancelled = True
     
     def download_file_to(self, url: str, filename: str):
-        r = requests.get(url, stream=True)
+        r = requests.get(url, stream=True, timeout=30)
+        r.raise_for_status()
         total = int(r.headers.get('content-length', 0))
 
         downloaded = 0
