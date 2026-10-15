@@ -3,7 +3,9 @@ import os
 LOG_THROTTLE_SECONDS=0.1
 DESKTOP_FILE_NAME='com.relative.Aegnux'
 
-BASE_DIR = os.getcwd()
+# Resolve paths from this file, not the working directory: os.getcwd() raises when the
+# launcher's cwd was deleted, and the installer can't find its assets when started elsewhere.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AE_ICON_PATH = BASE_DIR + '/icons/aegnux.png'
 STYLES_PATH = BASE_DIR + '/styles'
