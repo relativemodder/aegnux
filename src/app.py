@@ -25,4 +25,6 @@ def main():
     if show_window:
         mainWindow.show()
 
-    return app.exec()
+    exit_code = app.exec()
+    mainWindow.wait_for_workers()
+    return exit_code

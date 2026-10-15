@@ -3,9 +3,9 @@ import subprocess
 import sys
 from ui.mainwindow import MainWindowUI
 from translations import gls
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QThread
 from PySide6.QtGui import QAction, QKeySequence
-from PySide6.QtWidgets import QFileDialog, QMessageBox
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 from src.installationthread import InstallationThread
 from src.runaethread import RunAEThread
 from src.runexethread import RunExeThread
@@ -172,6 +172,13 @@ class MainWindow(MainWindowUI):
         self.log_action = self.debugMenu.addAction(gls('log_action'))
         self.term_action = self.debugMenu.addAction(gls('term_action'))
 
+    def wait_for_workers(self):
+        # Destroying a QThread that is still running aborts the process (Qt qFatal), which
+        # happens when the window closes while AE or an installer is still running.
+        for value in list(vars(self).values()):
+            if isinstance(value, QThread):
+                value.wait()
+
     def lock_ui(self, lock: bool = True):
         self.install_button.setEnabled(not lock)
         self.run_button.setEnabled(not lock)
@@ -189,7 +196,8 @@ class MainWindow(MainWindowUI):
     @Slot(bool)
     def _finished(self, success: bool):
         if self.quit_after_handling_args:
-            exit(0)
+            QApplication.quit()
+            return
         
         self.lock_ui(False)
         self.progress_bar.hide()
@@ -352,4 +360,4 @@ class MainWindow(MainWindowUI):
     
     @Slot()
     def run_command_ctrl_q(self):
-        exit()
+        QApplication.quit()
