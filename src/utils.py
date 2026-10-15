@@ -186,7 +186,7 @@ def get_default_terminal() -> str:
 
     # Debian/Ubuntu
     alt = "/etc/alternatives/x-terminal-emulator"
-    if os.path.exists(alt):
+    if os.path.islink(alt):
         candidates = (shutil.which(os.readlink(alt)), *candidates)
 
     # Popular terminals
