@@ -52,7 +52,7 @@ paru -S aegnux
 
 ### Install dependencies
 ```bash
-sudo pacman -Syu pyside6 python-requests unzip libarchive curl tar # Arch Linux
+sudo pacman -Syu pyside6 python-requests unzip libarchive curl tar zip # Arch Linux
 ```
 
 ### Clone the repository
