@@ -133,10 +133,9 @@ class InstallationThread(ProcessThread):
         ae_pf_dir = get_wineprefix_dir().joinpath('drive_c/Program Files/Adobe/Adobe After Effects 2024')
         support_files_dir = ae_pf_dir.joinpath('Support Files')
 
-        if not ae_pf_dir.exists():
-            os.makedirs(ae_pf_dir)
+        os.makedirs(ae_pf_dir, exist_ok=True)
         
-        if not support_files_dir.exists():
+        if not os.path.lexists(support_files_dir):
             os.symlink(ae_dir, support_files_dir)
         
         self.log_signal.emit(f'[DEBUG] Created symlink from {ae_dir} to {support_files_dir}')
@@ -212,7 +211,7 @@ class InstallationThread(ProcessThread):
 
         for source in [source_x64, source_x32]:
             for item in source.iterdir():
-                system_dir = system32_dir if 'x64' in source.as_posix() else syswow64_dir
+                system_dir = system32_dir if source.name == 'x64' else syswow64_dir
 
                 if item.is_file():
                     shutil.copy2(item, system_dir.joinpath(item.name))

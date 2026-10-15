@@ -64,8 +64,7 @@ def get_aegnux_installation_dir():
     data_home = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
     aegnux_dir = Path(data_home).joinpath('aegnux')
 
-    if not os.path.exists(aegnux_dir):
-        os.makedirs(aegnux_dir)
+    os.makedirs(aegnux_dir, exist_ok=True)
 
     return aegnux_dir
 
@@ -73,21 +72,21 @@ def get_ae_install_dir():
     aegnux_dir = get_aegnux_installation_dir()
     ae_dir = aegnux_dir.joinpath('AE')
 
-    if not os.path.exists(ae_dir):
-        os.makedirs(ae_dir)
+    os.makedirs(ae_dir, exist_ok=True)
 
     return ae_dir
 
 def get_ae_plugins_dir():
     ae_dir = get_ae_install_dir()
-    return ae_dir.joinpath('Plug-ins')
+    plugins_dir = ae_dir.joinpath('Plug-ins')
+    os.makedirs(plugins_dir, exist_ok=True)
+    return plugins_dir
 
 def get_wineprefix_dir():
     aegnux_dir = get_aegnux_installation_dir()
     wineprefix_dir = aegnux_dir.joinpath('wineprefix')
 
-    if not os.path.exists(wineprefix_dir):
-        os.makedirs(wineprefix_dir)
+    os.makedirs(wineprefix_dir, exist_ok=True)
 
     return wineprefix_dir
 
@@ -95,8 +94,7 @@ def get_cep_dir():
     wineprefix_dir = get_wineprefix_dir()
     cep_dir = wineprefix_dir.joinpath('drive_c/Program Files (x86)/Common Files/Adobe/CEP')
 
-    if not os.path.exists(cep_dir):
-        os.makedirs(cep_dir)
+    os.makedirs(cep_dir, exist_ok=True)
 
     return cep_dir
 
@@ -104,8 +102,7 @@ def get_wine_runner_dir():
     aegnux_dir = get_aegnux_installation_dir()
     runner_dir = aegnux_dir.joinpath('runner')
 
-    if not os.path.exists(runner_dir):
-        os.makedirs(runner_dir)
+    os.makedirs(runner_dir, exist_ok=True)
 
     return runner_dir
 
@@ -189,7 +186,7 @@ def get_default_terminal() -> str:
 
     # Debian/Ubuntu
     alt = "/etc/alternatives/x-terminal-emulator"
-    if os.path.exists(alt):
+    if os.path.islink(alt):
         candidates = (shutil.which(os.readlink(alt)), *candidates)
 
     # Popular terminals
@@ -220,7 +217,6 @@ def get_private_plugins_unpack_path():
     aegnux_dir = get_aegnux_installation_dir()
     ppu_dir = aegnux_dir.joinpath('private-plugins')
 
-    if not os.path.exists(ppu_dir):
-        os.makedirs(ppu_dir)
+    os.makedirs(ppu_dir, exist_ok=True)
 
     return ppu_dir
